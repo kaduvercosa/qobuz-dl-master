@@ -15,7 +15,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
@@ -38,7 +38,6 @@ except ImportError as e:
     )
 
 REPORT_FILENAME = ".report.json"
-_BRT = timezone(timedelta(hours=-3), name="BRT")
 
 _locks: Dict[str, asyncio.Lock] = {}
 _locks_guard = asyncio.Lock()
@@ -60,8 +59,18 @@ async def _get_lock(path: str) -> asyncio.Lock:
 
 
 def _now_iso() -> str:
-    """Retorna data/hora atual em BRT no formato ISO 8601."""
-    return datetime.now(_BRT).isoformat(timespec="seconds")
+    """
+    Retorna data/hora atual no fuso LOCAL da máquina, em ISO 8601 (com o
+    offset UTC embutido, ex.: "-03:00" ou "+01:00").
+
+    ANTES: cravava timezone(timedelta(hours=-3), name="BRT") direto no
+    código -- funcionava certo só pra quem está no fuso de Brasília,
+    mostrando hora errada no relatório de qualquer outro fuso. Sem
+    argumento, datetime.now() pega a hora local do sistema; astimezone()
+    (sem argumento também) anexa o offset UTC correspondente a esse fuso
+    local, automaticamente, em qualquer máquina/fuso onde o programa rodar.
+    """
+    return datetime.now().astimezone().isoformat(timespec="seconds")
 
 
 def _load_report(path: str) -> dict:

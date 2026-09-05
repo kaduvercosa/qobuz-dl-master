@@ -28,7 +28,7 @@ _MB_BASE = "https://musicbrainz.org/ws/2"
 _MB_HEADERS = {
     # MusicBrainz exige User-Agent identificando a app e versao.
     # Sem isso a resposta e' 403.
-    "User-Agent": "qobuz-dl-ultra/2.0 (https://github.com/user/qobuz-dl-ultra)",
+    "User-Agent": "qobuz-dl-ultra/2.5 (https://github.com/kaduvercosa/qobuz-dl-ultra)",
     "Accept": "application/json",
 }
 

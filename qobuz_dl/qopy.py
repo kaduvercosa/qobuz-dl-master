@@ -73,7 +73,7 @@ class Client:
         Fábrica assíncrona. Inicializa o cliente API e configura a sessão resiliente.
         """
         self = cls()
-        print(f"{YELLOW}Logando...{OFF}", end="", flush=True)
+        ui.emit(f"{YELLOW}Logando...{OFF}", end="")
         self.secrets = secrets
         self.id = str(app_id)
         self.force_english = force_english
@@ -90,7 +90,7 @@ class Client:
                             f"\r{GREEN}[+] ID do aplicativo atualizado dinamicamente: {self.id}{OFF}\033[K"
                         )
                 except Exception:
-                    print(
+                    ui.emit(
                         f"\r{YELLOW} [!] ID do aplicativo não atualizado (usando padrão).{OFF}\033[K"
                     )
         else:
