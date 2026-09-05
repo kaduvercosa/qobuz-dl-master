@@ -1,16 +1,16 @@
-name: Lint
+name: CI
 
-# Este workflow é novo. O repo já tinha um .flake8 configurado (max-line-length,
-# ignores, etc.), mas nada rodava ele automaticamente — só existia como arquivo
-# morto. Aqui ele roda a cada push/PR nas branches master/main.
+# "lint": roda o flake8 (usa o .flake8 do repo) sobre qobuz_dl/.
 #
-# NOTA sobre testes: test_lyrics.py e test_lyrics_translation.py NÃO entraram
-# neste workflow de propósito. Eles são scripts manuais/interativos (usam
-# input() e exigem login real no Qobuz via config.ini), não testes
-# automatizados de verdade — rodar eles em CI travaria esperando input() e
-# falharia por falta de credenciais. Se quiser testes reais de CI no futuro,
-# o caminho é escrever testes unitários novos (com pytest + mocks das
-# respostas da API), separados desses dois scripts de debug manual.
+# "tests": roda a suíte de testes automatizada (tests/test_*.py). Os
+# testes marcados "slow" (abrem subprocesso real do programa) ficam de
+# fora por padrão pra manter o CI rápido -- rode-os manualmente com
+# `pytest -m slow` quando precisar.
+#
+# tests/manual/ (ex.: verificar_letras.py) fica DE FORA de propósito:
+# exige login real no Qobuz e acesso à internet, não é coletado pelo
+# pytest (não tem prefixo "test_"), e não faz sentido em CI. Ver
+# tests/manual/README.md.
 
 on:
   push:
@@ -37,3 +37,21 @@ jobs:
 
       - name: Roda flake8 (usa o .flake8 do repo)
         run: flake8 qobuz_dl
+
+  tests:
+    name: Testes (pytest)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instala o projeto com as dependências de dev
+        run: python -m pip install --upgrade pip && pip install -e ".[dev]"
+
+      - name: Roda a suíte de testes (pula os marcados "slow")
+        run: pytest -m "not slow" -q
