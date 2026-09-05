@@ -167,80 +167,54 @@ class TestVerifyAudioIntegrity:
 
 
 class TestOrdemDaChecagem:
-    """Trava o bug de POSICAO da chamada, nao o comportamento dela.
+    """Trava o bug de POSICAO da chamada, nao o comportamento dela."""
 
-    A chamada de `checar_binarios_externos()` estava depois do bloco que trata
-    `--find-duplicates` no cli.py. Como aquele bloco termina em `sys.exit()`,
-    o aviso de fpcalc ausente nunca era alcancado por quem usava exatamente a
-    feature que depende do fpcalc. O aviso existia e estava correto -- so' era
-    inalcancavel.
-
-    Um teste de unidade da funcao passava normalmente com esse bug. So' um
-    teste que roda o programa de verdade pega.
-    """
-
-    def _rodar_sem_binarios(self, args, tmp_path, ambiente_isolado):
-        import subprocess
+    def _rodar_sem_binarios(self, args, monkeypatch, capsys):
         import sys
+        from qobuz_dl.cli import main
+        from qobuz_dl import utils
 
-        # PATH com apenas o interpretador: o programa roda, mas nao acha
-        # ffmpeg nem fpcalc.
-        bin_isolado = tmp_path / "bin"
-        bin_isolado.mkdir()
-        (bin_isolado / "python3").symlink_to(sys.executable)
+        # Isola os binários forçando shutil.which a não achar nada
+        monkeypatch.setattr(utils.shutil, "which", lambda *a, **k: None)
+        utils._BINARIOS_CHECADOS.clear()
 
-        env = dict(ambiente_isolado, PATH=str(bin_isolado))
+        # Injeta os argumentos direto na CLI
+        monkeypatch.setattr(sys, "argv", ["qobuz-dl", *args])
 
-        r = subprocess.run(
-            [sys.executable, "-m", "qobuz_dl", *args],
-            capture_output=True,
-            text=True,
-            env=env,
-            timeout=180,
-        )
-        return r.stdout + r.stderr
+        try:
+            main()
+        except SystemExit:
+            pass
+
+        saida = capsys.readouterr()
+        return saida.out + saida.err
 
     @pytest.mark.slow
-    def test_aviso_de_fpcalc_alcanca_find_duplicates(self, tmp_path, ambiente_isolado):
-        """A regressao exata: o aviso tem de aparecer ANTES do sys.exit()."""
+    def test_aviso_de_fpcalc_alcanca_find_duplicates(
+        self, tmp_path, monkeypatch, capsys
+    ):
         saida = self._rodar_sem_binarios(
-            ["--find-duplicates", str(tmp_path)], tmp_path, ambiente_isolado
+            ["--find-duplicates", str(tmp_path)], monkeypatch, capsys
         )
         assert "fpcalc nao encontrado" in saida
 
     @pytest.mark.slow
-    def test_aviso_de_ffmpeg_aparece_uma_vez_so(self, tmp_path, ambiente_isolado):
-        """O ponto todo da checagem centralizada: uma mensagem, nao uma por
-        arquivo."""
+    def test_aviso_de_ffmpeg_aparece_uma_vez_so(self, tmp_path, monkeypatch, capsys):
         saida = self._rodar_sem_binarios(
-            ["--find-duplicates", str(tmp_path)], tmp_path, ambiente_isolado
+            ["--find-duplicates", str(tmp_path)], monkeypatch, capsys
         )
         assert saida.count("[!] ffmpeg nao encontrado") == 1
 
     @pytest.mark.slow
-    def test_avisos_nao_estouram_terminal_estreito(self, tmp_path, ambiente_isolado):
-        """`ui.warn()` nao quebra linha -- so' o `ui.wrapped()` do detalhe. Se
-        alguem alongar o TITULO de um aviso, ele estoura em terminal estreito.
-        Este teste falha nesse caso."""
-        import subprocess
-        import sys
-
-        bin_isolado = tmp_path / "bin2"
-        bin_isolado.mkdir()
-        (bin_isolado / "python3").symlink_to(sys.executable)
-        env = dict(ambiente_isolado, PATH=str(bin_isolado), COLUMNS="32")
-
-        r = subprocess.run(
-            [sys.executable, "-m", "qobuz_dl", "--find-duplicates", str(tmp_path)],
-            capture_output=True,
-            text=True,
-            env=env,
-            timeout=180,
+    def test_avisos_nao_estouram_terminal_estreito(self, tmp_path, monkeypatch, capsys):
+        monkeypatch.setenv("COLUMNS", "32")
+        saida = self._rodar_sem_binarios(
+            ["--find-duplicates", str(tmp_path)], monkeypatch, capsys
         )
 
         bloco = [
             linha
-            for linha in (r.stdout + r.stderr).splitlines()
+            for linha in saida.splitlines()
             if "nao encontrado" in linha or linha.startswith("    ")
         ]
         estouros = [linha for linha in bloco if len(linha) > 32]

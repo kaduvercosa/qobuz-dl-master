@@ -29,4 +29,3 @@ packaging
 colorama>=0.4.6
 cryptography
 keyring
-Pillow>=10.0.0
