@@ -1,6 +1,0 @@
-{
-  "tests/test_ui_wrap.py::test_primeira_linha_comeca_com_tag[error]": true,
-  "tests/test_ui_wrap.py::test_primeira_linha_comeca_com_tag[skip]": true,
-  "tests/test_ui_wrap.py::test_mensagem_com_newline_interno": true,
-  "tests/test_ui_wrap.py::test_terminal_muito_estreito[20]": true
-}
