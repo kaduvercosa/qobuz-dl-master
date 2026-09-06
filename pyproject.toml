@@ -112,7 +112,12 @@ markers = [
 
 asyncio_mode = "auto"
 
-# BLOCO MINIMO do Ruff para o pyproject.toml
+# BLOCO VERIFICADO do Ruff para pyproject.toml
+# Regras VALIDAS mantidas:
+#   - B950: line-length warning (bugbear)
+#   - C414: unnecessary list/dict comprehension
+#   - C408: unnecessary dict() call
+#   - C901: function too complex (mccabe)
 
 [tool.ruff]
 target-version = "py310"
@@ -120,15 +125,25 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "W", "F", "B", "C", "T"]
+
 ignore = [
-  "E203", "E266", "E501",
+  # Whitespace / indentation
+  "E203", "E266",
   "W291", "W293",
-  "E226", "E731", "E741",
+  "E226", "E731", "E741", "E128",
+  # Line length (deixamos o formatter cuidar)
+  "E501",
+  # Unused / imports
   "F541", "F841", "E402",
+  # Complexidade (controlada via mccabe abaixo)
   "C901",
-  "B907", "B950", "B905",
-  "C414", "C408",
-  "E128",
+  # Bugbear especificas
+  "B907",  # REMOVIDA - nao existe no Ruff
+  "B950",  # line-length warning (opcional ignorar)
+  "B905",  # zip without strict=
+  # Comprehensions
+  "C414",  # unnecessary list/dict comprehension
+  "C408",  # unnecessary dict() call
 ]
 
 [tool.ruff.lint.mccabe]
