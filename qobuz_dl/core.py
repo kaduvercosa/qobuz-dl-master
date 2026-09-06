@@ -2559,9 +2559,8 @@ class QobuzDL:
         do_download = choice in ("1", "3")
         do_copy_qobuz = choice in ("2", "3")
 
-        logger.info(
-            f"\n{CYAN}[*] Fazendo matching de {len(tracks_list)} faixas no Qobuz...{OFF}"
-        )
+        logger.info(f"\n{CYAN}[*] Fazendo matching de {
+            len(tracks_list)} faixas no Qobuz...{OFF}")
         track_ids = await self.client.get_track_ids_from_list(tracks_list)
 
         if not track_ids:

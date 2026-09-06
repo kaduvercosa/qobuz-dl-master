@@ -15,7 +15,6 @@ import sys
 import textwrap
 import threading
 import time
-from typing import Optional, Tuple
 
 import aiofiles
 import httpx
@@ -54,7 +53,10 @@ from qobuz_dl.utils import (
 
 from .lyrics_engine import LyricsEngine
 
-# Ordem de fallback de qualidade quando o tier pedido falha por motivo de rede/servidor (NAO usado para faixas indisponiveis -- ver _PermanentDownloadError). 27=Hi-Res >96kHz | 7=Hi-Res 96kHz | 6=CD 16bit/44.1kHz | 5=MP3 320kbps
+# Ordem de fallback de qualidade quando o tier pedido falha por motivo de
+# rede/servidor (NAO usado para faixas indisponiveis -- ver
+# _PermanentDownloadError). 27=Hi-Res >96kHz | 7=Hi-Res 96kHz | 6=CD
+# 16bit/44.1kHz | 5=MP3 320kbps
 FALLBACK_TIERS = [27, 7, 6, 5]
 
 
@@ -99,9 +101,8 @@ def create_missing_placeholder(track: dict, folder_path: str, reason: str):
     except Exception as e:
         # Best-effort: o placeholder .missing.txt e' so' um marcador
         # informativo, nao deve derrubar o download por causa dele.
-        logger.debug(
-            f"Falha ao criar {file_path if 'file_path' in locals() else '.missing.txt'}: {e}"
-        )
+        logger.debug(f"Falha ao criar {
+            file_path if 'file_path' in locals() else '.missing.txt'}: {e}")
 
 
 class _PermanentDownloadError(Exception):
@@ -197,8 +198,8 @@ def emit_progress_json(settings, event, **fields):
 
 
 def _build_letras_report(
-    resultado: Optional[dict],
-    translation_lang: Optional[str],
+    resultado: dict | None,
+    translation_lang: str | None,
     qobuz_translation_response,
 ) -> dict:
     """
@@ -337,10 +338,16 @@ DEFAULT_FORMATS = {
 
 EMB_COVER_NAME = "embed_cover.jpg"
 
-# Limite de tamanho pra capa (bytes). Capa da Apple em 10000x10000 pode vir pesada demais em raras excecoes (albuns com arte muito detalhada); acima disso a gente reduz a resolucao em cascata em vez de usar essa versao. 16MB cobre folgado o tamanho tipico de uma APIC embutida sem deixar o arquivo de audio inchado por causa da capa.
+# Limite de tamanho pra capa (bytes). Capa da Apple em 10000x10000 pode
+# vir pesada demais em raras excecoes (albuns com arte muito detalhada);
+# acima disso a gente reduz a resolucao em cascata em vez de usar essa
+# versao. 16MB cobre folgado o tamanho tipico de uma APIC embutida sem
+# deixar o arquivo de audio inchado por causa da capa.
 MAX_COVER_BYTES = 16 * 1024 * 1024
 
-# Cascata de resolucoes da Apple, da maior pra menor, usada quando a 10000x10000bb estoura MAX_COVER_BYTES. artworkUrl100 troca livremente "100x100bb" por qualquer "NxNbb" na URL.
+# Cascata de resolucoes da Apple, da maior pra menor, usada quando a
+# 10000x10000bb estoura MAX_COVER_BYTES. artworkUrl100 troca livremente
+# "100x100bb" por qualquer "NxNbb" na URL.
 _APPLE_COVER_SIZES = [
     "10000x10000bb",
     "6000x6000bb",
@@ -1237,7 +1244,7 @@ class Download:
         is_parallel=False,
         position_pool=None,
         embed_cover_path=None,
-        letras_out: Optional[dict] = None,
+        letras_out: dict | None = None,
     ) -> bool:
         extension = ".mp3" if is_mp3 else ".flac"
         loop = asyncio.get_running_loop()
@@ -1438,13 +1445,16 @@ class Download:
                                 )
                                 ui.error(
                                     "Download segmentado falhou no tier "
-                                    f"{TIER_NAMES.get(attempt_fmt, attempt_fmt)}: {seg_e}"
+                                    f"{TIER_NAMES.get(attempt_fmt,
+                                                      attempt_fmt)}: {seg_e}"
                                 )
                                 continue
                         else:
                             ui.error(
                                 "Nenhum formato valido retornado pelo servidor "
-                                f"para o tier {TIER_NAMES.get(attempt_fmt, attempt_fmt)}."
+                                f"para o tier {
+                                    TIER_NAMES.get(
+                                        attempt_fmt, attempt_fmt)}."
                             )
                             continue
 
@@ -1539,12 +1549,14 @@ class Download:
                 if original_lang:
                     if original_lang.lower() == translation_lang.lower():
                         translation_note = (
-                            f"    ℹ️ Letras já em {GREEN}{translation_lang.upper()}{RESET} "
+                            f"    ℹ️ Letras já em {GREEN}{
+                                translation_lang.upper()}{RESET} "
                             f"-- sem necessidade de tradução."
                         )
                     else:
                         translation_note = (
-                            f"    ℹ️ Nenhuma tradução em {RED}{translation_lang.upper()}{RESET} "
+                            f"    ℹ️ Nenhuma tradução em {RED}{
+                                translation_lang.upper()}{RESET} "
                             f"disponivel no Qobuz ainda para esta faixa."
                         )
 
@@ -2189,7 +2201,8 @@ async def tqdm_download(
                             )
                         if r.status_code in (401, 403, 451):
                             raise _PermanentDownloadError(
-                                f"HTTP {r.status_code}: faixa indisponivel (bloqueio de "
+                                f"HTTP {
+                                    r.status_code}: faixa indisponivel (bloqueio de "
                                 f"região, direitos autorais ou sessão expirada)."
                             )
                         if r.status_code not in [200, 206]:
@@ -2513,7 +2526,10 @@ async def _get_cover_and_embed(
             await _gravar(embed_file, apple_bytes, "Capa de embed", "Apple (HQ)")
         return
 
-    # 2) Fallback: Qobuz, respeitando saved_art_size/embedded_art_size separadamente (igual ao comportamento original), reaproveitando o arquivo salvo pro embed quando os dois tamanhos resolvem pra' mesma URL -- evita baixar a mesma imagem duas vezes no caso mais comum.
+    # 2) Fallback: Qobuz, respeitando saved_art_size/embedded_art_size
+    # separadamente (igual ao comportamento original), reaproveitando o
+    # arquivo salvo pro embed quando os dois tamanhos resolvem pra' mesma URL
+    # -- evita baixar a mesma imagem duas vezes no caso mais comum.
     saved_url = _resolve_art_url(item, saved_art_size) if precisa_salva else None
     embed_url = _resolve_art_url(item, embedded_art_size) if precisa_embed else None
 
@@ -2542,7 +2558,7 @@ async def _get_cover_and_embed(
         ui.skip("Pulando arte incorporada: nenhuma fonte disponível")
 
 
-def _clean_format_str(folder: str, track: str, file_format: str) -> Tuple[str, str]:
+def _clean_format_str(folder: str, track: str, file_format: str) -> tuple[str, str]:
     final = []
     for _i, fs in enumerate((folder, track)):
         if fs.endswith(".mp3"):

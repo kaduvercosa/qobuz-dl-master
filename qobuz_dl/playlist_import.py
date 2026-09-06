@@ -25,10 +25,9 @@ import csv
 import json
 import os
 import re
-from typing import Dict, List
 
 
-def parse_playlist_file(path: str) -> List[Dict[str, str]]:
+def parse_playlist_file(path: str) -> list[dict[str, str]]:
     """
     Detecta o formato do arquivo e retorna uma lista de dicts normalizados.
 
@@ -69,7 +68,7 @@ def parse_playlist_file(path: str) -> List[Dict[str, str]]:
 # ─── Parsers por formato ──────────────────────────────────────────────────────
 
 
-def _parse_txt(path: str) -> List[Dict[str, str]]:
+def _parse_txt(path: str) -> list[dict[str, str]]:
     """
     TXT: uma entrada por linha.
     Formatos aceitos:
@@ -95,7 +94,7 @@ def _parse_txt(path: str) -> List[Dict[str, str]]:
     return results
 
 
-def _parse_csv(path: str) -> List[Dict[str, str]]:
+def _parse_csv(path: str) -> list[dict[str, str]]:
     """
     CSV: detecta separador (, ; \\t) e mapeia colunas.
     Colunas reconhecidas automaticamente (case-insensitive):
@@ -171,7 +170,7 @@ def _parse_csv(path: str) -> List[Dict[str, str]]:
     return results
 
 
-def _parse_json(path: str) -> List[Dict[str, str]]:
+def _parse_json(path: str) -> list[dict[str, str]]:
     """
     JSON: suporta múltiplos formatos de export.
 

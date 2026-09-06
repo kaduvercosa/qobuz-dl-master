@@ -16,7 +16,7 @@ import json
 import logging
 import os
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +39,7 @@ except ImportError as e:
 
 REPORT_FILENAME = ".report.json"
 
-_locks: Dict[str, asyncio.Lock] = {}
+_locks: dict[str, asyncio.Lock] = {}
 _locks_guard = asyncio.Lock()
 
 
@@ -96,7 +96,7 @@ def _atomic_write_json(path: str, data: Any) -> None:
     os.replace(tmp_path, path)
 
 
-def _norm_id(value: Any) -> Optional[str]:
+def _norm_id(value: Any) -> str | None:
     """Converte ID em texto normalizado."""
     if value is None:
         return None
@@ -113,7 +113,7 @@ def _formatar_artistas(valor: Any) -> str:
     return str(valor).strip()
 
 
-def _lista_artistas(valor: Any) -> List[str]:
+def _lista_artistas(valor: Any) -> list[str]:
     """Converte artista individual, lista ou texto CSV em lista limpa."""
     if valor is None:
         return []
@@ -192,7 +192,7 @@ _LETRAS_FAIXA_ORDER = [
 _TIPO_PRIORIDADE = {"faixa": 1, "playlist": 2, "album": 3}
 
 
-def _ordenar(dados: dict, ordem: List[str]) -> dict:
+def _ordenar(dados: dict, ordem: list[str]) -> dict:
     """Reordena chaves conhecidas, mantendo chaves extras ao final."""
     saida = {chave: dados[chave] for chave in ordem if chave in dados}
     for chave, valor in dados.items():
@@ -211,10 +211,10 @@ def _skeleton(
     titulo: str,
     artista: Any,
     item_id: str,
-    extra: Optional[dict],
-    qualidade: Optional[dict],
-    tipo_lancamento: Optional[str] = None,
-    upc: Optional[str] = None,
+    extra: dict | None,
+    qualidade: dict | None,
+    tipo_lancamento: str | None = None,
+    upc: str | None = None,
 ) -> dict:
     """Cria o esqueleto de um relatorio no nivel do item."""
     agora = _now_iso()
@@ -340,10 +340,10 @@ async def init_report(
     artista: Any = "",
     tipo_lancamento: str = "",
     item_id: str = "",
-    extra: Optional[dict] = None,
-    qualidade: Optional[dict] = None,
-    faixas_previstas: Optional[List[dict]] = None,
-    upc: Optional[str] = None,
+    extra: dict | None = None,
+    qualidade: dict | None = None,
+    faixas_previstas: list[dict] | None = None,
+    upc: str | None = None,
     filename: str = REPORT_FILENAME,
 ) -> str:
     """Cria ou atualiza o relatorio do item e registra as faixas previstas."""
@@ -422,14 +422,14 @@ async def update_track_status(
     status: str,
     artista: Any = "",
     artista_album: Any = None,
-    tipo_lancamento: Optional[str] = None,
+    tipo_lancamento: str | None = None,
     motivo: str = "",
     isrc: str = "",
     compositor: Any = "",
-    checksum: Optional[str] = None,
-    letras: Optional[dict] = None,
+    checksum: str | None = None,
+    letras: dict | None = None,
     tipo_default: str = "faixa",
-    titulo_default: Optional[str] = None,
+    titulo_default: str | None = None,
     id_default: str = "",
     filename: str = REPORT_FILENAME,
     **_ignored: Any,
@@ -557,7 +557,7 @@ async def update_track_status(
 async def finalize_report(
     dirn: str,
     completo: bool,
-    qualidade_atingida: Optional[bool] = None,
+    qualidade_atingida: bool | None = None,
     verificado: bool = False,
     filename: str = REPORT_FILENAME,
 ) -> None:

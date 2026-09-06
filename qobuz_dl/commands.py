@@ -412,8 +412,8 @@ def add_common_arg(custom_parser, default_folder, default_quality):
         "--folder-format",
         metavar="PATTERN",
         help="""padrão para formatar nomes de pastas, ex:
-        "{album_artist} - {album_title} ({year}) {{{barcode}}}". chaves disponíveis: 
-        album_id, album_url, album_title, album_title_base, album_artist, album_genre, 
+        "{album_artist} - {album_title} ({year}) {{{barcode}}}". chaves disponíveis:
+        album_id, album_url, album_title, album_title_base, album_artist, album_genre,
         album_composer, label, copyright, upc, barcode, release_date, year, media_type,
         format, bit_depth, sampling_rate, album_version, disc_count, track_count.
         Nota: Você pode usar '/' para criar subdiretórios.""",
@@ -429,9 +429,9 @@ def add_common_arg(custom_parser, default_folder, default_quality):
         "--track-format",
         metavar="PATTERN",
         help="""padrão para formatar nomes das faixas. ex:
-        "{track_number} - {track_title}" 
+        "{track_number} - {track_title}"
         chaves disponíveis:
-        album_title, album_title_base, album_artist, track_id, track_artist, track_composer, 
+        album_title, album_title_base, album_artist, track_id, track_artist, track_composer,
         track_number, isrc, bit_depth, sampling_rate, track_title, track_title_base
         version, year, disc_number, release_date.
         Não pode conter caracteres bloqueados pelo sistema operativo.""",
@@ -690,6 +690,27 @@ def stats_args(subparsers):
     return stats
 
 
+def inspect_args(subparsers, default_folder=None):
+    inspect = subparsers.add_parser(
+        "inspect",
+        usage="qobuz-dl inspect [caminho]",
+        description=(
+            "Abre um navegador de arquivos pra escolher uma faixa de áudio local "
+            "e mostra TODAS as tags/metadados dela, mais uma checagem heurística "
+            "de autenticidade (é genuinamente lossless/hi-res, ou é upsample de "
+            "uma fonte lossy disfarçado de FLAC?)."
+        ),
+        help="inspeciona tags e autenticidade de um arquivo de áudio local",
+    )
+    inspect.add_argument(
+        "caminho",
+        nargs="?",
+        default=default_folder,
+        help="pasta onde começar a navegação (padrão: sua pasta de downloads)",
+    )
+    return inspect
+
+
 # ----------------------------------------------------------------------------
 # Montagem do parser principal
 # ----------------------------------------------------------------------------
@@ -764,6 +785,7 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder=None):
     lyrics_cmd = lyrics_args(subparsers, default_folder=default_folder)
     sync_pl_cmd = sync_playlist_args(subparsers)
     stats = stats_args(subparsers)
+    inspect_cmd = inspect_args(subparsers, default_folder=default_folder)
     auth_cmd = auth_args(subparsers)
     user_cmd = user_args(subparsers)
 
@@ -778,6 +800,7 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder=None):
         lyrics_cmd,
         sync_pl_cmd,
         stats,
+        inspect_cmd,
         auth_cmd,
         user_cmd,
     ):

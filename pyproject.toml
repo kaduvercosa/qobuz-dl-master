@@ -72,8 +72,11 @@ genius = [
     "lyricsgenius>=3.0; python_version >= '3.11'",
     "lyricsgenius>=3.0,<3.7.4; python_version < '3.11'",
 ]
+analyze = [
+    "numpy",
+]
 all = [
-    "qobuz-dl-ultra[speed,covers,watch,duplicates,genius]",
+    "qobuz-dl-ultra[speed,covers,watch,duplicates,genius,analyze]",
 ]
 dev = [
     "pytest>=8",
@@ -108,4 +111,3 @@ markers = [
 ]
 
 asyncio_mode = "auto"
-

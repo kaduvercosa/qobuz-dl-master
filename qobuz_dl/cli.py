@@ -602,15 +602,17 @@ async def _auth_command(
         ui.emit(f"   • Display Name:      {user_info.get('display_name', 'N/A')}")
         ui.emit(f"   • E-mail:            {user_info.get('email', 'N/A')}")
         ui.emit(f"   • Login:             {user_info.get('login', 'N/A')}")
-        ui.emit(
-            f"   • ID do Usuário:     {user_info.get('id', 'N/A')} [Public ID: {user_info.get('publicId', 'N/A')}]"
-        )
-        ui.emit(
-            f"   • País / Zona:       {user_info.get('country', 'N/A')} / {user_info.get('zone', 'N/A')}"
-        )
-        ui.emit(
-            f"   • Loja / Idioma:     {user_info.get('store', 'N/A')} ({user_info.get('language_code', 'N/A')})"
-        )
+        ui.emit(f"   • ID do Usuário:     {
+                user_info.get(
+                    'id', 'N/A')} [Public ID: {
+                user_info.get(
+                    'publicId', 'N/A')}]")
+        ui.emit(f"   • País / Zona:       {user_info.get('country',
+                                                     'N/A')} / {user_info.get('zone',
+                                                                              'N/A')}")
+        ui.emit(f"   • Loja / Idioma:     {user_info.get('store',
+                                                     'N/A')} ({user_info.get('language_code',
+                                                                             'N/A')})")
 
         def format_date_br(d_str):
             if not d_str:
@@ -622,25 +624,34 @@ async def _auth_command(
             except Exception:
                 return str(d_str)
 
-        ui.emit(
-            f"   • Nascimento / Idade:{format_date_br(user_info.get('birthdate'))} ({user_info.get('age', 'N/A')} anos, {user_info.get('genre', 'N/A')})"
-        )
+        ui.emit(f"   • Nascimento / Idade:{
+                format_date_br(
+                    user_info.get('birthdate'))} ({
+                user_info.get(
+                    'age',
+                    'N/A')} anos, {
+                user_info.get(
+                    'genre',
+                    'N/A')})")
         ui.emit(
             f"   • Conta Criada em:   {format_date_br(user_info.get('creation_date'))}"
         )
 
         ui.emit(f"\n {CYAN}[💳 STATUS DA SUBSCRIÇÃO (ASSINATURA)]{OFF}")
-        ui.emit(
-            f"   • Status Atual:      {status_color}● {str(sub_info.get('status')).upper()}{OFF}"
-        )
+        ui.emit(f"   • Status Atual:      {status_color}● {
+                str(
+                    sub_info.get('status')).upper()}{OFF}")
         ui.emit(f"   • Plano / Oferta:    {sub_info.get('offer', 'N/A')}")
-        ui.emit(
-            f"   • Periodicidade:     {str(sub_info.get('periodicity', 'N/A')).capitalize()}"
-        )
+        ui.emit(f"   • Periodicidade:     {
+                str(
+                    sub_info.get(
+                        'periodicity',
+                        'N/A')).capitalize()}")
         ui.emit(f"   • Data de Início:    {sub_info.get('start_date') or 'N/A'}")
         ui.emit(f"   • Data de Término:   {sub_info.get('end_date') or 'N/A'}")
         ui.emit(
-            f"   • Cancelamento:      {'Sim (Cancelada pelo usuário)' if sub_info.get('is_canceled') else 'Não'}"
+            f"   • Cancelamento:      {
+                'Sim (Cancelada pelo usuário)' if sub_info.get('is_canceled') else 'Não'}"
         )
         ui.emit(
             f"   • Vagas Família:     {sub_info.get('household_size_max')} membro(s)"
@@ -648,42 +659,39 @@ async def _auth_command(
 
         ui.emit(f"\n {CYAN}[🎛️ CREDENCIAL & RECURSOS DA CONTA]{OFF}")
         ui.emit(f"   • Tipo de Membro:    {cred.get('description', 'Membro Qobuz')}")
-        ui.emit(
-            f"   • Streaming:         {'Disponível' if sf.get('streaming') else 'Indisponível'}"
-        )
-        ui.emit(
-            f"   • Letras (Lyrics):   {'Disponível' if sf.get('lyrics') else 'Indisponível'}"
-        )
-        ui.emit(
-            f"   • Importação Músicas:{'Disponível' if sf.get('music_import') else 'Indisponível'}"
-        )
-        ui.emit(
-            f"   • Rádio / Club / Q:  {'Disponível' if sf.get('radio') or sf.get('club') else 'Indisponível'}"
-        )
+        ui.emit(f"   • Streaming:         {
+                'Disponível' if sf.get('streaming') else 'Indisponível'}")
+        ui.emit(f"   • Letras (Lyrics):   {
+                'Disponível' if sf.get('lyrics') else 'Indisponível'}")
+        ui.emit(f"   • Importação Músicas:{
+                'Disponível' if sf.get('music_import') else 'Indisponível'}")
+        ui.emit(f"   • Rádio / Club / Q:  {
+                'Disponível' if sf.get('radio') or sf.get('club') else 'Indisponível'}")
 
         if last_update:
             ui.emit(f"\n {CYAN}[📊 ATIVIDADES & ÚLTIMAS ATUALIZAÇÕES]{OFF}")
-            ui.emit(
-                f"   • Playlists:         {_format_timestamp(last_update.get('playlist'))}"
-            )
-            ui.emit(
-                f"   • Álbuns Favoritos:  {_format_timestamp(last_update.get('favorite_album'))}"
-            )
-            ui.emit(
-                f"   • Faixas Favoritas:  {_format_timestamp(last_update.get('favorite_track'))}"
-            )
-            ui.emit(
-                f"   • Artistas Favoritos:{_format_timestamp(last_update.get('favorite_artist'))}"
-            )
-            ui.emit(
-                f"   • Compras na Loja:   {_format_timestamp(last_update.get('purchase'))}"
-            )
+            ui.emit(f"   • Playlists:         {
+                    _format_timestamp(
+                        last_update.get('playlist'))}")
+            ui.emit(f"   • Álbuns Favoritos:  {
+                    _format_timestamp(
+                        last_update.get('favorite_album'))}")
+            ui.emit(f"   • Faixas Favoritas:  {
+                    _format_timestamp(
+                        last_update.get('favorite_track'))}")
+            ui.emit(f"   • Artistas Favoritos:{
+                    _format_timestamp(
+                        last_update.get('favorite_artist'))}")
+            ui.emit(f"   • Compras na Loja:   {
+                    _format_timestamp(
+                        last_update.get('purchase'))}")
 
         # Se a assinatura estiver inativa e não acabamos de atualizar:
         if not sub_info.get("is_active"):
             ui.warn("⚠️  AVISO DE ASSINATURA INATIVA:")
             ui.detail(
-                f"Sua assinatura expirou em {sub_info.get('end_date')}. Para baixar álbuns e faixas "
+                f"Sua assinatura expirou em {
+                    sub_info.get('end_date')}. Para baixar álbuns e faixas "
                 "completas em alta resolução, é necessário possuir uma conta ativa."
             )
             ui.emit("=" * 68)
@@ -734,15 +742,19 @@ async def _garantir_assinatura_ativa(qobuz: QobuzDL) -> bool:
     while not sub_info.get("is_active"):
         ui.error("CONTA SEM ASSINATURA ATIVA NO QOBUZ")
         ui.emit(f" {CYAN}•{OFF} Status Atual:       {RED}{sub_info.get('status')}{OFF}")
-        ui.emit(
-            f" {CYAN}•{OFF} Plano:              {sub_info.get('offer', 'N/A')} ({str(sub_info.get('periodicity', 'N/A')).capitalize()})"
-        )
+        ui.emit(f" {CYAN}•{OFF} Plano:              {
+                sub_info.get(
+                    'offer',
+                    'N/A')} ({
+                str(
+                    sub_info.get(
+                        'periodicity',
+                        'N/A')).capitalize()})")
         ui.emit(
             f" {CYAN}•{OFF} Validade / Término: {sub_info.get('end_date') or 'N/A'}"
         )
-        ui.emit(
-            f" {CYAN}•{OFF} Cancelamento:       {'Sim (Cancelada)' if sub_info.get('is_canceled') else 'Não'}"
-        )
+        ui.emit(f" {CYAN}•{OFF} Cancelamento:       {
+                'Sim (Cancelada)' if sub_info.get('is_canceled') else 'Não'}")
         ui.warn(
             "ℹ️  Sem uma assinatura ativa, a API da Qobuz não permite o download "
             "de faixas completas. É obrigatório informar o e-mail e o user_token "
@@ -764,10 +776,15 @@ async def _garantir_assinatura_ativa(qobuz: QobuzDL) -> bool:
             ui.detail(f"Para ver os detalhes da conta, use: {GREEN}qobuz-dl auth{OFF}")
             return False
 
-        # _auth_command já pede o novo e-mail/token, valida na API e salva (no Keyring ou no config.ini, conforme a configuração do usuário).
+        # _auth_command já pede o novo e-mail/token, valida na API e salva (no
+        # Keyring ou no config.ini, conforme a configuração do usuário).
         await _auth_command(CONFIG_FILE, update_credentials=True)
 
-        # Recarrega as credenciais recém-salvas do disco e reinicializa o cliente principal (`qobuz.client`) com elas -- não importa se a conta ficou ativa ou não: o laço reavalia a assinatura logo abaixo e, se ainda estiver inativa, volta ao topo e pede a atualização de novo, mostrando o status da conta que acabou de ser testada.
+        # Recarrega as credenciais recém-salvas do disco e reinicializa o cliente
+        # principal (`qobuz.client`) com elas -- não importa se a conta ficou
+        # ativa ou não: o laço reavalia a assinatura logo abaixo e, se ainda
+        # estiver inativa, volta ao topo e pede a atualização de novo, mostrando o
+        # status da conta que acabou de ser testada.
         config = configparser.ConfigParser(interpolation=None)
         config.read(CONFIG_FILE, encoding="utf-8")
         section = "qobuz" if config.has_section("qobuz") else "DEFAULT"
@@ -969,6 +986,7 @@ _COMMAND_DESCRIPTIONS_PT = {
     "sync-playlist": "Sincroniza uma pasta local com uma playlist do Qobuz (baixa o que falta, remove o que saiu).",
     "import-playlist": "Importa um arquivo de playlist (TXT, CSV, JSON) de qualquer plataforma para download.",
     "stats": "Mostra estatísticas detalhadas sobre sua biblioteca e downloads efetuados.",
+    "inspect": "Navega e mostra TODAS as tags de um arquivo de áudio local, mais uma checagem de autenticidade (lossless de verdade ou upsample de fonte lossy?).",
     "auth": "Exibe status da conta/assinatura ou atualiza credenciais de login e token.",
     "user": "Exibe informações da conta, status da assinatura e dados do perfil.",
 }
@@ -1040,28 +1058,55 @@ def _initial_checks():
 
 
 def check_for_updates():
+    """Verifica atualizações sem interferir no fluxo principal.
+
+    A checagem é opcional. Qualquer falha de rede, HTTP, JSON ou versão deve
+    ser ignorada silenciosamente na saída, mas registrada em DEBUG para
+    diagnóstico com --verbose.
+    """
     try:
         from qobuz_dl import __version__
 
-        url = "https://api.github.com/repos/kaduvercosa/qobuz-dl-ultra/releases/latest"
+        url = (
+            "https://api.github.com/repos/kaduvercosa/" "qobuz-dl-ultra/releases/latest"
+        )
+
         response = httpx.get(url, timeout=2)
         response.raise_for_status()
 
-        latest_version_str = response.json().get("tag_name", "").lstrip("vV")
+        payload = response.json()
+        latest_version_str = payload.get("tag_name", "").lstrip("vV")
+
+        if not latest_version_str:
+            return
+
         current_version_str = __version__
 
-        versao_remota = Version(latest_version_str)
-        versao_local = Version(current_version_str)
+        try:
+            versao_remota = Version(latest_version_str)
+            versao_local = Version(current_version_str)
+        except Exception:
+            logger.debug(
+                "Checagem de atualização falhou: InvalidVersion: " "tag=%s, current=%s",
+                latest_version_str,
+                current_version_str,
+            )
+            return
 
         if versao_remota > versao_local:
             ui.warn(
-                f"ATUALIZAÇÃO DISPONÍVEL: Ultra Edition v{latest_version_str} está disponível!"
+                f"ATUALIZAÇÃO DISPONÍVEL: Ultra Edition "
+                f"v{latest_version_str} está disponível!"
             )
             ui.detail("- PyPI: rode 'pip install --upgrade qobuz-dl-ultra'")
             ui.detail("- Docker: puxe a imagem mais recente")
 
     except Exception as e:
-        logger.debug("Checagem de atualização falhou: %s: %s", type(e).__name__, e)
+        logger.debug(
+            "Checagem de atualização falhou: %s: %s",
+            type(e).__name__,
+            e,
+        )
 
 
 # ==============================================================================
@@ -1093,6 +1138,13 @@ async def async_main():
                 QOBUZ_DB,
                 show_all_artists=getattr(offline_args, "artistas", False),
             )
+        )
+
+    if offline_command == "inspect":
+        from qobuz_dl.inspector import run_inspector
+
+        sys.exit(
+            await run_inspector(getattr(offline_args, "caminho", None) or os.getcwd())
         )
 
     config = configparser.ConfigParser(interpolation=None)

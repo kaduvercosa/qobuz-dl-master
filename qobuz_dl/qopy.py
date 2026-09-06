@@ -9,7 +9,7 @@ import logging
 import time
 import unicodedata
 from datetime import date, datetime
-from typing import Any, Dict
+from typing import Any
 
 import httpx
 from cryptography.hazmat.primitives import hashes, padding
@@ -198,14 +198,15 @@ class Client:
                 logger.info(f"{GREEN}Logado: OK (Assinatura: {self.label}){OFF}")
             else:
                 logger.warning(
-                    f"{YELLOW}[!] Logado: OK, mas a assinatura está {RED}INATIVA{RESET} ({sub['status']}){OFF}"
+                    f"{YELLOW}[!] Logado: OK, mas a assinatura está {RED}INATIVA{RESET} ({
+                        sub['status']}){OFF}"
                 )
         except Exception:
             logger.info(f"{YELLOW}[!] Validação do perfil ignorada.{OFF}")
             self.label = "Studio"
             self.user_id = None
 
-    def check_subscription(self) -> Dict[str, Any]:
+    def check_subscription(self) -> dict[str, Any]:
         """
         Valida o estado da assinatura a partir dos dados do usuário (user_info).
         """
@@ -283,7 +284,7 @@ class Client:
             "raw": sub,
         }
 
-    async def get_user_profile(self) -> Dict[str, Any]:
+    async def get_user_profile(self) -> dict[str, Any]:
         """Consulta dados atualizados do endpoint user/get."""
         raw = await self.api_call("user/get")
         self.user_info = raw.get("user", raw)
@@ -814,9 +815,8 @@ class Client:
         """
         sub_info = self.check_subscription()
         if not sub_info["is_active"]:
-            raise NoActiveSubscriptionError(
-                f"Assinatura inativa ou expirada ({sub_info['status']}). Download bloqueado."
-            )
+            raise NoActiveSubscriptionError(f"Assinatura inativa ou expirada ({
+                sub_info['status']}). Download bloqueado.")
 
         if int(fmt_id) == 5:
             return await self.api_call("track/getFileUrl", id=id, fmt_id=fmt_id)
