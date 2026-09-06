@@ -1,0 +1,30 @@
+# Mantém automaticamente atualizadas as versões das GitHub Actions
+# usadas em pypi.yml, lint.yml e docker.yml (actions/checkout,
+# actions/setup-python, docker/login-action, docker/metadata-action,
+# docker/build-push-action, pypa/gh-action-pypi-publish, etc.)
+#
+# O Dependabot varre todos os arquivos dentro de .github/workflows/
+# automaticamente quando o ecossistema é "github-actions" -- não
+# precisa listar cada workflow manualmente.
+
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"   # troque para "daily" se quiser checagem diária
+      day: "monday"
+      time: "06:00"
+      timezone: "America/Recife"
+    groups:
+      # Agrupa todas as atualizações em um único PR por semana,
+      # em vez de um PR separado para cada action.
+      github-actions:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "ci"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    open-pull-requests-limit: 10
