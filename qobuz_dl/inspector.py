@@ -16,7 +16,6 @@
 # ==============================================================================
 import os
 import subprocess
-import sys
 
 from qobuz_dl import ui
 from qobuz_dl.utils import encontrar_binario, format_duration
@@ -45,7 +44,18 @@ from qobuz_dl.core import pt_style
 # quem está vendo -- e atualiza sozinho se a pessoa alternar o modo com o
 # arquivo já aberto.
 
-_AUDIO_EXTS = (".flac", ".mp3", ".m4a", ".alac", ".ogg", ".opus", ".wav", ".aiff", ".ape", ".wv")
+_AUDIO_EXTS = (
+    ".flac",
+    ".mp3",
+    ".m4a",
+    ".alac",
+    ".ogg",
+    ".opus",
+    ".wav",
+    ".aiff",
+    ".ape",
+    ".wv",
+)
 
 
 def _detectar_pasta_padrao():
@@ -90,8 +100,10 @@ def _detectar_pasta_padrao():
     # /data/data/com.termux/files/home, e o armazenamento compartilhado
     # do Android (onde o usuário de fato vê "Música" no gerenciador de
     # arquivos) fica montado à parte, não dentro do HOME do Termux.
-    if "com.termux" in home_dir or os.environ.get("ANDROID_ROOT") or os.environ.get(
-        "ANDROID_DATA"
+    if (
+        "com.termux" in home_dir
+        or os.environ.get("ANDROID_ROOT")
+        or os.environ.get("ANDROID_DATA")
     ):
         candidatos.append("/storage/emulated/0/Music")
         candidatos.append("/sdcard/Music")
@@ -134,7 +146,11 @@ def _listar_diretorio(caminho):
         return entradas
 
     pastas = sorted(
-        (e for e in brutos if e.is_dir(follow_symlinks=False) and not e.name.startswith(".")),
+        (
+            e
+            for e in brutos
+            if e.is_dir(follow_symlinks=False) and not e.name.startswith(".")
+        ),
         key=lambda e: e.name.lower(),
     )
     arquivos = sorted(
@@ -292,12 +308,18 @@ async def _navegar_arquivos(diretorio_inicial):
     def get_list_text():
         res = []
         if not estado["entradas"]:
-            res.append(("class:footer", "\n   (pasta vazia ou sem arquivos de áudio)\n"))
+            res.append(
+                ("class:footer", "\n   (pasta vazia ou sem arquivos de áudio)\n")
+            )
             return res
 
         for i, item in enumerate(estado["entradas"]):
             hovered = i == estado["cursor"]
-            estilo = "class:hovered" if hovered else ("class:item_title" if item["is_dir"] else "")
+            estilo = (
+                "class:hovered"
+                if hovered
+                else ("class:item_title" if item["is_dir"] else "")
+            )
             prefixo = "▶ " if hovered else "  "
             res.append((estilo, f" {prefixo}{item['nome']}\n"))
 
@@ -373,7 +395,9 @@ def _extrair_tudo(caminho):
                 "Profundidade de bits": f"{info.bits_per_sample} bits",
                 "Canais": info.channels,
                 "Duração": format_duration(info.length),
-                "Bitrate médio": f"{info.bitrate // 1000} kbps" if info.bitrate else "N/A",
+                "Bitrate médio": (
+                    f"{info.bitrate // 1000} kbps" if info.bitrate else "N/A"
+                ),
             }
         )
         dados["_sample_rate"] = info.sample_rate
@@ -433,7 +457,9 @@ def _extrair_tudo(caminho):
                 "Canais": getattr(info, "channels", "?"),
                 "Duração": format_duration(info.length),
                 "Bitrate": (
-                    f"{info.bitrate // 1000} kbps" if getattr(info, "bitrate", None) else "N/A"
+                    f"{info.bitrate // 1000} kbps"
+                    if getattr(info, "bitrate", None)
+                    else "N/A"
                 ),
             }
         )
@@ -504,10 +530,21 @@ def _checar_genuinidade(caminho, sample_rate, duracao_s):
         try:
             resultado = subprocess.run(
                 [
-                    ffmpeg, "-nostdin", "-v", "error",
-                    "-ss", str(inicio), "-t", str(janela_s),
-                    "-i", caminho,
-                    "-ac", "1", "-f", "f32le", "-",
+                    ffmpeg,
+                    "-nostdin",
+                    "-v",
+                    "error",
+                    "-ss",
+                    str(inicio),
+                    "-t",
+                    str(janela_s),
+                    "-i",
+                    caminho,
+                    "-ac",
+                    "1",
+                    "-f",
+                    "f32le",
+                    "-",
                 ],
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -550,12 +587,15 @@ def _checar_genuinidade(caminho, sample_rate, duracao_s):
         if fatia_limpa:
             fatia_limpa.sort()
             mid = len(fatia_limpa) // 2
-            piso_db = float(fatia_limpa[mid] if len(fatia_limpa) % 2 != 0 else (fatia_limpa[mid - 1] + fatia_limpa[mid]) / 2)
+            piso_db = float(
+                fatia_limpa[mid]
+                if len(fatia_limpa) % 2 != 0
+                else (fatia_limpa[mid - 1] + fatia_limpa[mid]) / 2
+            )
         else:
             piso_db = float(np.min(media_db))
     else:
         piso_db = float(np.median(media_db[-fatia_topo:]))
-
 
     limiar_db = max(piso_db + 10, pico_db - 60)
 
@@ -741,9 +781,11 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
             "depois pra parecer um FLAC/Hi-Res.",
         ),
     }[veredito]
-    veredito_txt = {"genuino": "GENUÍNO", "inconclusivo": "INCONCLUSIVO", "suspeito": "SUSPEITO"}[
-        veredito
-    ]
+    veredito_txt = {
+        "genuino": "GENUÍNO",
+        "inconclusivo": "INCONCLUSIVO",
+        "suspeito": "SUSPEITO",
+    }[veredito]
 
     # -- Elementos SVG: grade, hachura, curva, linhas de referência -------
     partes_svg = []
@@ -774,8 +816,12 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
         f'<rect x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" '
         f'fill="none" stroke="var(--cor-secundario)" stroke-width="1"/>'
     )
-    partes_svg.append(f'<text x="8" y="{y0 - 4}" class="rotulo-pequeno">MAIS SOM</text>')
-    partes_svg.append(f'<text x="8" y="{y1 + 16}" class="rotulo-pequeno">MENOS SOM</text>')
+    partes_svg.append(
+        f'<text x="8" y="{y0 - 4}" class="rotulo-pequeno">MAIS SOM</text>'
+    )
+    partes_svg.append(
+        f'<text x="8" y="{y1 + 16}" class="rotulo-pequeno">MENOS SOM</text>'
+    )
 
     if 0 < 20000 < nyquist_hz * 1.02:
         px_20k = _x_px(20000)
@@ -789,7 +835,9 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
         )
 
     pontos = " ".join(
-        f"{_x_px(f):.1f},{_y_px(db):.1f}" for f, db in zip(freqs, media_db) if f <= nyquist_hz
+        f"{_x_px(f):.1f},{_y_px(db):.1f}"
+        for f, db in zip(freqs, media_db)
+        if f <= nyquist_hz
     )
     partes_svg.append(
         f'<polyline points="{pontos}" fill="none" stroke="var(--cor-destaque)" '
@@ -950,7 +998,7 @@ def _mostrar_relatorio(caminho, dados, genuinidade):
         # Aplica a cor correta baseada no dicionário de genuinidade (verde/amarelo/vermelho)
         cor_fn = {"ok": ui.ok, "warn": ui.warn, "error": ui.error}[genuinidade["cor"]]
         cor_fn(genuinidade["mensagem"])
-        
+
         ui.kv("Corte detectado", f"{genuinidade['corte_hz'] / 1000:.2f} kHz")
         ui.kv("Nyquist esperado", f"{genuinidade['nyquist_hz'] / 1000:.2f} kHz")
         ui.kv("Banda utilizada", f"{genuinidade['proporcao'] * 100:.0f}%")
@@ -967,7 +1015,9 @@ def _mostrar_relatorio(caminho, dados, genuinidade):
                 assert os.path.dirname(destino) == os.path.dirname(caminho)
                 ui.ok(f"  Gráfico salvo em '{destino}' (abra no navegador)")
             else:
-                ui.warn("Não havia dados de espectro suficientes pra desenhar o gráfico.")
+                ui.warn(
+                    "Não havia dados de espectro suficientes pra desenhar o gráfico."
+                )
         except Exception as e:
             ui.error(f"Erro ao gerar o gráfico: {e}")
 
