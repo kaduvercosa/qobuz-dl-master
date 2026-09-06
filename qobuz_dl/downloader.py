@@ -104,7 +104,9 @@ def create_missing_placeholder(track: dict, folder_path: str, reason: str):
     except Exception as e:
         # Best-effort: o placeholder .missing.txt e' so' um marcador
         # informativo, nao deve derrubar o download por causa dele.
-        logger.debug(f"Falha ao criar {file_path if 'file_path' in locals() else '.missing.txt'}: {e}")
+        logger.debug(
+            f"Falha ao criar {file_path if 'file_path' in locals() else '.missing.txt'}: {e}"
+        )
 
 
 class _PermanentDownloadError(Exception):
@@ -488,7 +490,7 @@ class Download:
             album_meta.get("release_type") != "album"
             or album_meta.get("artist").get("name") == "Various Artists"
         ):
-            ui.skip(f'Ignorando Single/EP/VA: {album_meta.get("title", "n/a")}')
+            ui.skip(f"Ignorando Single/EP/VA: {album_meta.get('title', 'n/a')}")
             return
 
         album_title = _get_title(album_meta)
@@ -822,7 +824,9 @@ class Download:
                     # Encerrando por CTRL+C/cancelamento -- fechar a sessao
                     # e' limpeza best-effort, nao pode impedir o `raise`
                     # abaixo de propagar a interrupcao.
-                    logger.debug(f"Falha ao fechar http_session durante cancelamento: {e}")
+                    logger.debug(
+                        f"Falha ao fechar http_session durante cancelamento: {e}"
+                    )
                 raise
 
             for res in results:
@@ -1639,7 +1643,7 @@ class Download:
             "track_id": track_metadata.get("id"),
             "track_artist": track_artist,
             "track_composer": _safe_get(track_metadata, "composer", "name"),
-            "track_number": f'{track_metadata.get("track_number", 0):02}',
+            "track_number": f"{track_metadata.get('track_number', 0):02}",
             "isrc": track_metadata.get("isrc"),
             "bit_depth": track_metadata.get("maximum_bit_depth"),
             "sampling_rate": track_metadata.get("maximum_sampling_rate"),
@@ -1647,7 +1651,7 @@ class Download:
             "track_title_base": track_metadata.get("title"),
             "version": track_metadata.get("version"),
             "year": track_metadata.get("release_date_original", "").split("-")[0],
-            "disc_number": f'{track_metadata.get("media_number"):02}',
+            "disc_number": f"{track_metadata.get('media_number'):02}",
             "release_date": track_metadata.get("release_date_original"),
             "ExplicitFlag": "🅴" if track_metadata.get("parental_warning") else "",
             "explicit": "🅴" if track_metadata.get("parental_warning") else "",
@@ -2711,7 +2715,6 @@ async def tqdm_download_segments(
                 dynamic_ncols=dynamic_ncols,
                 disable=is_parallel,
             ) as bar:
-
                 segment_uuid = None
 
                 for i in range(2):
@@ -2871,7 +2874,7 @@ async def _download_goodies(
             if not goody.get("url"):
                 continue
             goody_name = sanitize_filename(
-                clean_filename(f'{album_meta.get("title")} ({goody.get("id")}).pdf')
+                clean_filename(f"{album_meta.get('title')} ({goody.get('id')}).pdf")
             )
             await _get_extra(
                 goody.get("url"),
