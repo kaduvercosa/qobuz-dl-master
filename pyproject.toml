@@ -112,8 +112,6 @@ markers = [
 
 asyncio_mode = "auto"
 
-# BLOCO CORRETO do Ruff para pyproject.toml
-
 [tool.ruff]
 target-version = "py310"
 line-length = 88
@@ -122,22 +120,15 @@ line-length = 88
 select = ["E", "W", "F", "B", "C", "T"]
 
 ignore = [
-  # Whitespace / indentation
   "E203", "E266",
   "W291", "W293",
   "E226", "E731", "E741",
-  # Line length (deixamos o formatter cuidar)
   "E501",
-  # Unused / imports
   "F541", "F841", "E402",
-  # Complexidade (controlada via mccabe abaixo)
   "C901",
-  # Bugbear especificas (B907 REMOVIDA - nao existe no Ruff)
-  "B950",
-  "B905",
-  # Comprehensions
   "C414",
   "C408",
+  "B905",
 ]
 
 [tool.ruff.lint.mccabe]
