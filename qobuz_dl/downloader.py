@@ -5,58 +5,61 @@
 # e as funcoes de apoio (capa, booklet, letras, nomes de arquivo/pasta).
 # Ponto de entrada tipico: Download(...).download_id_by_type(...).
 # ============================================================================
-import asyncio
+from qobuz_dl.settings import QobuzDLSettings
+from qobuz_dl.constants import (
+    DEFAULT_FOLDER,
+    DEFAULT_TRACK,
+    DEFAULT_MULTIPLE_DISC_TRACK,
+)
+from qobuz_dl.db import handle_download_id
+from qobuz_dl.utils import (
+    get_album_artist,
+    clean_filename,
+    verify_audio_integrity,
+    classify_release_type,
+    get_apple_hq_cover,
+)
+from .lyrics_engine import LyricsEngine
+import qobuz_dl.postprocess as postprocess
 import logging
 import os
-import re
 import shutil
-import signal
 import sys
-import textwrap
-import threading
 import time
+import re
+import threading
+import signal
+import textwrap
+from typing import Optional, Tuple
+import asyncio
 
-import aiofiles
 import httpx
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from pathvalidate import sanitize_filename, sanitize_filepath
-from tenacity import (
-    AsyncRetrying,
-    retry_if_not_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
 from tqdm import tqdm
 
 import qobuz_dl.metadata as metadata
-import qobuz_dl.postprocess as postprocess
 from qobuz_dl import ui
-from qobuz_dl.color import GREEN
-from qobuz_dl.color import INFO as CYAN
-from qobuz_dl.color import MUTED, OFF, RED, RESET
-from qobuz_dl.color import WARNING as YELLOW
-from qobuz_dl.constants import (
-    DEFAULT_FOLDER,
-    DEFAULT_MULTIPLE_DISC_TRACK,
-    DEFAULT_TRACK,
+from qobuz_dl.color import (
+    OFF,
+    GREEN,
+    RED,
+    WARNING as YELLOW,
+    INFO as CYAN,
+    RESET,
+    MUTED,
 )
-from qobuz_dl.db import handle_download_id
 from qobuz_dl.exceptions import NonStreamable
-from qobuz_dl.settings import QobuzDLSettings
-from qobuz_dl.utils import (
-    classify_release_type,
-    clean_filename,
-    get_album_artist,
-    get_apple_hq_cover,
-    verify_audio_integrity,
+
+import aiofiles
+from tenacity import (
+    AsyncRetrying,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_not_exception_type,
 )
 
-from .lyrics_engine import LyricsEngine
-
-# Ordem de fallback de qualidade quando o tier pedido falha por motivo de
-# rede/servidor (NAO usado para faixas indisponiveis -- ver
-# _PermanentDownloadError). 27=Hi-Res >96kHz | 7=Hi-Res 96kHz | 6=CD
-# 16bit/44.1kHz | 5=MP3 320kbps
+# Ordem de fallback de qualidade quando o tier pedido falha por motivo de rede/servidor (NAO usado para faixas indisponiveis -- ver _PermanentDownloadError). 27=Hi-Res >96kHz | 7=Hi-Res 96kHz | 6=CD 16bit/44.1kHz | 5=MP3 320kbps
 FALLBACK_TIERS = [27, 7, 6, 5]
 
 
@@ -101,11 +104,7 @@ def create_missing_placeholder(track: dict, folder_path: str, reason: str):
     except Exception as e:
         # Best-effort: o placeholder .missing.txt e' so' um marcador
         # informativo, nao deve derrubar o download por causa dele.
-        logger.debug(
-            f"Falha ao criar {
-                file_path if 'file_path' in locals() else '.missing.txt'
-            }: {e}"
-        )
+        logger.debug(f"Falha ao criar {file_path if 'file_path' in locals() else '.missing.txt'}: {e}")
 
 
 class _PermanentDownloadError(Exception):
@@ -117,6 +116,8 @@ class _PermanentDownloadError(Exception):
     timeout ou erro 5xx, que pode ser so' uma soneca passageira do
     servidor.
     """
+
+    pass
 
 
 print_lock = ui.print_lock
@@ -201,8 +202,8 @@ def emit_progress_json(settings, event, **fields):
 
 
 def _build_letras_report(
-    resultado: dict | None,
-    translation_lang: str | None,
+    resultado: Optional[dict],
+    translation_lang: Optional[str],
     qobuz_translation_response,
 ) -> dict:
     """
@@ -341,16 +342,10 @@ DEFAULT_FORMATS = {
 
 EMB_COVER_NAME = "embed_cover.jpg"
 
-# Limite de tamanho pra capa (bytes). Capa da Apple em 10000x10000 pode
-# vir pesada demais em raras excecoes (albuns com arte muito detalhada);
-# acima disso a gente reduz a resolucao em cascata em vez de usar essa
-# versao. 16MB cobre folgado o tamanho tipico de uma APIC embutida sem
-# deixar o arquivo de audio inchado por causa da capa.
+# Limite de tamanho pra capa (bytes). Capa da Apple em 10000x10000 pode vir pesada demais em raras excecoes (albuns com arte muito detalhada); acima disso a gente reduz a resolucao em cascata em vez de usar essa versao. 16MB cobre folgado o tamanho tipico de uma APIC embutida sem deixar o arquivo de audio inchado por causa da capa.
 MAX_COVER_BYTES = 16 * 1024 * 1024
 
-# Cascata de resolucoes da Apple, da maior pra menor, usada quando a
-# 10000x10000bb estoura MAX_COVER_BYTES. artworkUrl100 troca livremente
-# "100x100bb" por qualquer "NxNbb" na URL.
+# Cascata de resolucoes da Apple, da maior pra menor, usada quando a 10000x10000bb estoura MAX_COVER_BYTES. artworkUrl100 troca livremente "100x100bb" por qualquer "NxNbb" na URL.
 _APPLE_COVER_SIZES = [
     "10000x10000bb",
     "6000x6000bb",
@@ -493,7 +488,7 @@ class Download:
             album_meta.get("release_type") != "album"
             or album_meta.get("artist").get("name") == "Various Artists"
         ):
-            ui.skip(f"Ignorando Single/EP/VA: {album_meta.get('title', 'n/a')}")
+            ui.skip(f'Ignorando Single/EP/VA: {album_meta.get("title", "n/a")}')
             return
 
         album_title = _get_title(album_meta)
@@ -827,9 +822,7 @@ class Download:
                     # Encerrando por CTRL+C/cancelamento -- fechar a sessao
                     # e' limpeza best-effort, nao pode impedir o `raise`
                     # abaixo de propagar a interrupcao.
-                    logger.debug(
-                        f"Falha ao fechar http_session durante cancelamento: {e}"
-                    )
+                    logger.debug(f"Falha ao fechar http_session durante cancelamento: {e}")
                 raise
 
             for res in results:
@@ -1247,7 +1240,7 @@ class Download:
         is_parallel=False,
         position_pool=None,
         embed_cover_path=None,
-        letras_out: dict | None = None,
+        letras_out: Optional[dict] = None,
     ) -> bool:
         extension = ".mp3" if is_mp3 else ".flac"
         loop = asyncio.get_running_loop()
@@ -1448,17 +1441,13 @@ class Download:
                                 )
                                 ui.error(
                                     "Download segmentado falhou no tier "
-                                    f"{TIER_NAMES.get(attempt_fmt, attempt_fmt)}: {
-                                        seg_e
-                                    }"
+                                    f"{TIER_NAMES.get(attempt_fmt, attempt_fmt)}: {seg_e}"
                                 )
                                 continue
                         else:
                             ui.error(
                                 "Nenhum formato valido retornado pelo servidor "
-                                f"para o tier {
-                                    TIER_NAMES.get(attempt_fmt, attempt_fmt)
-                                }."
+                                f"para o tier {TIER_NAMES.get(attempt_fmt, attempt_fmt)}."
                             )
                             continue
 
@@ -1553,16 +1542,12 @@ class Download:
                 if original_lang:
                     if original_lang.lower() == translation_lang.lower():
                         translation_note = (
-                            f"    ℹ️ Letras já em {GREEN}{translation_lang.upper()}{
-                                RESET
-                            } "
+                            f"    ℹ️ Letras já em {GREEN}{translation_lang.upper()}{RESET} "
                             f"-- sem necessidade de tradução."
                         )
                     else:
                         translation_note = (
-                            f"    ℹ️ Nenhuma tradução em {RED}{translation_lang.upper()}{
-                                RESET
-                            } "
+                            f"    ℹ️ Nenhuma tradução em {RED}{translation_lang.upper()}{RESET} "
                             f"disponivel no Qobuz ainda para esta faixa."
                         )
 
@@ -1654,7 +1639,7 @@ class Download:
             "track_id": track_metadata.get("id"),
             "track_artist": track_artist,
             "track_composer": _safe_get(track_metadata, "composer", "name"),
-            "track_number": f"{track_metadata.get('track_number', 0):02}",
+            "track_number": f'{track_metadata.get("track_number", 0):02}',
             "isrc": track_metadata.get("isrc"),
             "bit_depth": track_metadata.get("maximum_bit_depth"),
             "sampling_rate": track_metadata.get("maximum_sampling_rate"),
@@ -1662,10 +1647,10 @@ class Download:
             "track_title_base": track_metadata.get("title"),
             "version": track_metadata.get("version"),
             "year": track_metadata.get("release_date_original", "").split("-")[0],
-            "disc_number": f"{track_metadata.get('media_number'):02}",
+            "disc_number": f'{track_metadata.get("media_number"):02}',
             "release_date": track_metadata.get("release_date_original"),
-            "ExplicitFlag": "[E]" if track_metadata.get("parental_warning") else "",
-            "explicit": "[E]" if track_metadata.get("parental_warning") else "",
+            "ExplicitFlag": "🅴" if track_metadata.get("parental_warning") else "",
+            "explicit": "🅴" if track_metadata.get("parental_warning") else "",
         }
 
     @staticmethod
@@ -2080,7 +2065,7 @@ class Download:
             lyrics_text = ""
 
             if os.path.exists(lrc_path):
-                with open(lrc_path, encoding="utf-8") as f:
+                with open(lrc_path, "r", encoding="utf-8") as f:
                     raw_lyrics = f.read()
                 clean_lyrics = re.sub(
                     r"\[[a-zA-Z]+:.*?\]\n?|\[\d{2,}:\d{2}\.\d{2,3}\]", "", raw_lyrics
@@ -2092,7 +2077,7 @@ class Download:
                 ]
                 lyrics_text = "\n".join(clean_lines).strip()
             elif os.path.exists(txt_path) and "Tracklist" not in txt_path:
-                with open(txt_path, encoding="utf-8") as f:
+                with open(txt_path, "r", encoding="utf-8") as f:
                     lyrics_text = f.read().strip()
 
             if lyrics_text:
@@ -2207,9 +2192,7 @@ async def tqdm_download(
                             )
                         if r.status_code in (401, 403, 451):
                             raise _PermanentDownloadError(
-                                f"HTTP {
-                                    r.status_code
-                                }: faixa indisponivel (bloqueio de "
+                                f"HTTP {r.status_code}: faixa indisponivel (bloqueio de "
                                 f"região, direitos autorais ou sessão expirada)."
                             )
                         if r.status_code not in [200, 206]:
@@ -2533,10 +2516,7 @@ async def _get_cover_and_embed(
             await _gravar(embed_file, apple_bytes, "Capa de embed", "Apple (HQ)")
         return
 
-    # 2) Fallback: Qobuz, respeitando saved_art_size/embedded_art_size
-    # separadamente (igual ao comportamento original), reaproveitando o
-    # arquivo salvo pro embed quando os dois tamanhos resolvem pra' mesma URL
-    # -- evita baixar a mesma imagem duas vezes no caso mais comum.
+    # 2) Fallback: Qobuz, respeitando saved_art_size/embedded_art_size separadamente (igual ao comportamento original), reaproveitando o arquivo salvo pro embed quando os dois tamanhos resolvem pra' mesma URL -- evita baixar a mesma imagem duas vezes no caso mais comum.
     saved_url = _resolve_art_url(item, saved_art_size) if precisa_salva else None
     embed_url = _resolve_art_url(item, embedded_art_size) if precisa_embed else None
 
@@ -2565,7 +2545,7 @@ async def _get_cover_and_embed(
         ui.skip("Pulando arte incorporada: nenhuma fonte disponível")
 
 
-def _clean_format_str(folder: str, track: str, file_format: str) -> tuple[str, str]:
+def _clean_format_str(folder: str, track: str, file_format: str) -> Tuple[str, str]:
     final = []
     for _i, fs in enumerate((folder, track)):
         if fs.endswith(".mp3"):
@@ -2731,6 +2711,7 @@ async def tqdm_download_segments(
                 dynamic_ncols=dynamic_ncols,
                 disable=is_parallel,
             ) as bar:
+
                 segment_uuid = None
 
                 for i in range(2):
@@ -2890,7 +2871,7 @@ async def _download_goodies(
             if not goody.get("url"):
                 continue
             goody_name = sanitize_filename(
-                clean_filename(f"{album_meta.get('title')} ({goody.get('id')}).pdf")
+                clean_filename(f'{album_meta.get("title")} ({goody.get("id")}).pdf')
             )
             await _get_extra(
                 goody.get("url"),

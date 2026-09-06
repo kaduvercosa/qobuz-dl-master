@@ -20,7 +20,7 @@ DEFAULT_FOLDER = (
 # nome do arquivo porque ja' aparece no nivel da pasta (ALBUMARTIST).
 # Quem quiser o artista por faixa pode setar no config:
 #   track_format = {track_number}. {track_title_base} - {track_artist}
-DEFAULT_TRACK = "{track_number}. {track_title_base}"
+DEFAULT_TRACK = "{track_number}. {track_title_base} {explicit}"
 
 # Formato padrão específico para álbuns com MÚLTIPLOS DISCOS (prefixa o
 # número do disco antes do número da faixa, ex: "1.03 - Nome da Faixa").

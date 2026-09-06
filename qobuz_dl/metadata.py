@@ -582,11 +582,15 @@ def _get_tags_to_add(
         tags["ALBUM"] = _get_title_with_version(
             title=qobuz_album.get("title", ""), version=qobuz_album.get("version", "")
         )
+
+    # Flag de conteúdo explícito SOMENTE da faixa atual
+    is_explicit_track = bool(qobuz_item.get("parental_warning", False))
+
     if not settings.no_track_title_tag:
         track_title = _get_title_with_version(
             title=qobuz_item.get("title", ""), version=qobuz_item.get("version", "")
         )
-        if qobuz_item.get("parental_warning", False):
+        if is_explicit_track:
             track_title += " 🅴"
         tags["TITLE"] = track_title
 
@@ -705,9 +709,10 @@ def _get_tags_to_add(
     if not settings.no_media_type_tag:
         tags["MEDIATYPE"] = qobuz_album.get("product_type", "").upper()
     if not settings.no_explicit_tag:
-        tags["ITUNESADVISORY"] = (
-            "1" if qobuz_item.get("parental_warning", False) else ""
-        )
+        tags["ITUNESADVISORY"] = "1" if is_explicit_track else ""
+        # EXPLICIT E RATING garantem suporte do icone nativo E em players FLAC
+        tags["EXPLICIT"] = "1" if is_explicit_track else ""
+        tags["RATING"] = "Explicit" if is_explicit_track else ""
 
     # BUGFIX: antes lia qobuz_album.get("release_type") cru -- o mesmo
     # campo que classify_release_type() existe justamente pra corrigir
