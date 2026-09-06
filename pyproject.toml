@@ -112,40 +112,43 @@ markers = [
 
 asyncio_mode = "auto"
 
-# Espelha as regras do .flake8 atual:
-#   - E, F, W, B, C, T4 (pycodestyle, Pyflakes, pycodestyle warnings,
-#     flake8-bugbear, mccabe complexity, flake8-print)
-#   - Ignora as mesmas regras que o .flake8 ignora
-#   - Mantem max-line-length = 88 e complexidade alta (55)
+# Ruff >= 0.2.x exige que select/ignore fiquem em [tool.ruff.lint]
+# e removeu regras como W503/W504 que conflitam com formatadores.
 #
-# Apos colar, rode no CI:
-#   ruff check qobuz_dl/
-#   ruff format --check qobuz_dl/
+# Esta config espelha o .flake8 atual, menos as regras inexistentes no Ruff.
 
 [tool.ruff]
 target-version = "py310"  # matches requires-python = ">=3.10"
 line-length = 88
 
-# Mesmas ignorancias do .flake8
-lint.ignore = [
-  "E203", "E266", "E501", "W503", "W504", "W291",
-  "E226", "E731", "E741", "F541", "F841", "E402",
-  "C901", "B907", "B950", "C414", "B905", "C408",
-  "E128",
-]
-
+[tool.ruff.lint]
 # Regras ativas: pycodestyle (E, W), Pyflakes (F),
 # flake8-bugbear (B), mccabe (C), flake8-print (T)
-lint.select = [
+select = [
   "E", "W", "F", "B", "C", "T",
 ]
 
+# Ignorar regras equivalentes ao .flake8, exceto W503/W504 que nao existem mais
+lint.ignore = [
+  "E203", "E266", "E501",        # whitespace / line-length
+  "W291", "W293",                # trailing whitespace / blank line whitespace
+  "E226", "E731", "E741",        # whitespace around operators / lambda / ambig names
+  "F541", "F841", "E402",        # f-string sem placeholders / variavel nao usada / import fora do topo
+  "C901",                        # complexidade (controlada via mccabe abaixo)
+  "B907", "B950", "B905",        # bugbear especificas
+  "C414", "C408",                # comprehensions
+  "E128",                        # indentation de linhas quebradas
+  # W503 e W504 NAO existem mais no Ruff - removidos
+]
+
 # Complexidade maxima (equivalente ao max-complexity = 55 do flake8)
-lint.mccabe.max-complexity = 55
+[tool.ruff.lint.mccabe]
+max-complexity = 55
 
 # Permite fix automatico para tudo (quando rodar --fix)
-lint.fixable = ["ALL"]
-lint.unfixable = []
+[tool.ruff.lint]
+fixable = ["ALL"]
+unfixable = []
 
 [tool.ruff.format]
 quote-style = "double"
