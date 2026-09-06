@@ -16,6 +16,7 @@ from qobuz_dl.color import ERROR as RED
 from qobuz_dl.color import MUTED, RESET
 from qobuz_dl.color import SUCCESS as GREEN
 from qobuz_dl.color import WARNING as YELLOW
+from qobuz_dl import __version__
 from qobuz_dl.settings import QobuzDLSettings
 
 logger = logging.getLogger(__name__)
@@ -601,7 +602,11 @@ class LyricsEngine:
             # Fallback LRCLIB
             lrclib_url = "https://lrclib.net/api/get"
             headers = {
-                "User-Agent": "qobuz-dl-ultra/1.0 (https://github.com/kaduvercosa/qobuz-dl-ultra)"
+                # BUGFIX: User-Agent estava cravado em "qobuz-dl-ultra/1.0"
+                # -- versão de quando esse trecho foi escrito, nunca mais
+                # atualizada (o projeto já ia na 2.x há tempos). Usando
+                # __version__ direto do pacote, nunca mais fica velho.
+                "User-Agent": f"qobuz-dl-ultra/{__version__} (https://github.com/kaduvercosa/qobuz-dl-ultra)"
             }
 
             params = {"artist_name": artist, "track_name": track, "album_name": album}

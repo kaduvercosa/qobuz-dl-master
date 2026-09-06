@@ -22,13 +22,17 @@ import logging
 
 import httpx
 
+from qobuz_dl import __version__
+
 logger = logging.getLogger(__name__)
 
 _MB_BASE = "https://musicbrainz.org/ws/2"
 _MB_HEADERS = {
     # MusicBrainz exige User-Agent identificando a app e versao.
-    # Sem isso a resposta e' 403.
-    "User-Agent": "qobuz-dl-ultra/2.5 (https://github.com/kaduvercosa/qobuz-dl-ultra)",
+    # Sem isso a resposta e' 403. Usa __version__ do pacote em vez de
+    # cravar um numero fixo, que inevitavelmente fica desatualizado (ja
+    # aconteceu duas vezes: primeiro travado em 1.0, depois em 2.0).
+    "User-Agent": f"qobuz-dl-ultra/{__version__} (https://github.com/kaduvercosa/qobuz-dl-ultra)",
     "Accept": "application/json",
 }
 

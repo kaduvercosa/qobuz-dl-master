@@ -414,9 +414,12 @@ def add_common_arg(custom_parser, default_folder, default_quality):
         help="""padrão para formatar nomes de pastas, ex:
         "{album_artist} - {album_title} ({year}) {{{barcode}}}". chaves disponíveis:
         album_id, album_url, album_title, album_title_base, album_artist, album_genre,
-        album_composer, label, copyright, upc, barcode, release_date, year, media_type,
-        format, bit_depth, sampling_rate, album_version, disc_count, track_count.
-        Nota: Você pode usar '/' para criar subdiretórios.""",
+        album_composer, label, copyright, upc, barcode, release_date, year, release_type,
+        media_type, format, bit_depth, sampling_rate, album_version, disc_count, track_count.
+        Nota: release_type (Album/EP/Single/Compilation/Live) é calculado com correção de
+        heurística e é o que o padrão usa; media_type vem cru da API da Qobuz e pode
+        divergir em alguns lançamentos -- prefira release_type. Você pode usar '/' para
+        criar subdiretórios.""",
     )
     custom_parser.add_argument(
         "-fbff",

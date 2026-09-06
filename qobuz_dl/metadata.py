@@ -15,7 +15,7 @@ from mutagen.flac import FLAC, Picture
 from mutagen.id3 import ID3NoHeaderError
 
 from qobuz_dl.settings import QobuzDLSettings
-from qobuz_dl.utils import get_album_artist
+from qobuz_dl.utils import classify_release_type, get_album_artist
 
 logger = logging.getLogger(__name__)
 
@@ -356,7 +356,18 @@ def tag_flac(
     _dur_s = int(qobuz_item.get("duration") or 0)
     _duration = f"{_dur_s // 60}:{_dur_s % 60:02d}" if _dur_s else "?"
 
-    _rtype = (qobuz_album.get("release_type") or "album").lower()
+    # BUGFIX: usava qobuz_album.get("release_type") cru -- esse campo
+    # vem errado da API com frequencia (mesmo motivo que existe
+    # classify_release_type() em utils.py). So' aparece num log
+    # verboso ("Tipo: ..."), mas o valor errado aqui e' exatamente o
+    # tipo de coisa que classify_release_type() foi feito pra evitar.
+    _rtype = classify_release_type(
+        title=qobuz_album.get("title"),
+        version=qobuz_album.get("version"),
+        track_count=qobuz_album.get("tracks_count", 0),
+        duration_seconds=qobuz_album.get("duration", 0),
+        api_release_type=qobuz_album.get("release_type"),
+    )
 
     _raw_date = qobuz_album.get("release_date_original", "") or ""
     try:
@@ -465,7 +476,18 @@ def tag_mp3(
     _dur_s = int(qobuz_item.get("duration") or 0)
     _duration = f"{_dur_s // 60}:{_dur_s % 60:02d}" if _dur_s else "?"
 
-    _rtype = (qobuz_album.get("release_type") or "album").lower()
+    # BUGFIX: usava qobuz_album.get("release_type") cru -- esse campo
+    # vem errado da API com frequencia (mesmo motivo que existe
+    # classify_release_type() em utils.py). So' aparece num log
+    # verboso ("Tipo: ..."), mas o valor errado aqui e' exatamente o
+    # tipo de coisa que classify_release_type() foi feito pra evitar.
+    _rtype = classify_release_type(
+        title=qobuz_album.get("title"),
+        version=qobuz_album.get("version"),
+        track_count=qobuz_album.get("tracks_count", 0),
+        duration_seconds=qobuz_album.get("duration", 0),
+        api_release_type=qobuz_album.get("release_type"),
+    )
 
     _raw_date = qobuz_album.get("release_date_original", "") or ""
     try:
@@ -687,8 +709,21 @@ def _get_tags_to_add(
             "1" if qobuz_item.get("parental_warning", False) else ""
         )
 
-    release_type = qobuz_album.get("release_type", "") or ""
-    if release_type.lower() == "compilation":
+    # BUGFIX: antes lia qobuz_album.get("release_type") cru -- o mesmo
+    # campo que classify_release_type() existe justamente pra corrigir
+    # (a API erra esse campo com frequência). Isso podia deixar a tag
+    # COMPILATION do arquivo em desacordo com a pasta onde ele é salvo
+    # (que já usa a versão corrigida via format_release_type() em
+    # downloader.py) -- uma coletânea podia ir pra pasta "Compilation/"
+    # e mesmo assim não ganhar COMPILATION=1 no arquivo, ou vice-versa.
+    release_type = classify_release_type(
+        title=qobuz_album.get("title"),
+        version=qobuz_album.get("version"),
+        track_count=qobuz_album.get("tracks_count", 0),
+        duration_seconds=qobuz_album.get("duration", 0),
+        api_release_type=qobuz_album.get("release_type"),
+    )
+    if release_type == "compilation":
         tags["COMPILATION"] = "1"
 
     if not getattr(settings, "no_replaygain_tag", False):
