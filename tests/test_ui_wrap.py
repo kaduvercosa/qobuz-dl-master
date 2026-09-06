@@ -30,7 +30,7 @@ MENSAGEM_REAL = "Nenhum dado encontrado. Comece a baixar para popular as estatis
 
 MENSAGENS = [
     MENSAGEM_REAL,
-    ("Album baixado com sucesso: Nujabes - Metaphorical Music " "(2003, FLAC 24/96)"),
+    ("Album baixado com sucesso: Nujabes - Metaphorical Music (2003, FLAC 24/96)"),
     "Falha ao autenticar no Qobuz: verifique email e senha no config.ini",
     "curta",
     "palavra-unica-muito-longa-sem-nenhum-espaço-para-quebrar-em-lugar-algum",
@@ -164,9 +164,9 @@ def test_primeira_linha_tem_tag(funcao, monkeypatch, capsys):
     )
 
     assert linhas, "nenhuma linha foi emitida"
-    assert re.match(
-        r"^\[[+!*~-]\] ", linhas[0]
-    ), f"primeira linha não começa com tag: {linhas[0]!r}"
+    assert re.match(r"^\[[+!*~-]\] ", linhas[0]), (
+        f"primeira linha não começa com tag: {linhas[0]!r}"
+    )
 
 
 def test_mensagem_vazia_nao_estoura(monkeypatch, capsys):

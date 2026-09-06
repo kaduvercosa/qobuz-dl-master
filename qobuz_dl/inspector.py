@@ -956,7 +956,7 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
   </div>
   <div class="rodape">
     <span class="badge badge-{veredito}">{veredito_txt}</span>
-    <span class="proporcao">{genuinidade['proporcao'] * 100:.0f}% da banda com som de verdade</span>
+    <span class="proporcao">{genuinidade["proporcao"] * 100:.0f}% da banda com som de verdade</span>
   </div>
   <p class="marca">QOBUZ-DL INSPECTOR</p>
 </div>

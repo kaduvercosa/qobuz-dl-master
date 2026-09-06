@@ -106,8 +106,7 @@ def test_nenhuma_mensagem_e_perdida():
     completas = LINHA_COMPLETA.findall(saida)
 
     assert len(completas) == N_WORKERS * N_MSGS, (
-        f"esperado {N_WORKERS * N_MSGS} mensagens inteiras, "
-        f"encontrado {len(completas)}"
+        f"esperado {N_WORKERS * N_MSGS} mensagens inteiras, encontrado {len(completas)}"
     )
 
 

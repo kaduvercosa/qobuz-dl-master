@@ -363,7 +363,8 @@ async def process_retroactive_lyrics_async(
                                     display_name,
                                     "ATUALIZADO",
                                     f"Letra original inserida em {
-                                        target_lang.upper()} (traducao desnecessaria)",
+                                        target_lang.upper()
+                                    } (traducao desnecessaria)",
                                 )
                             )
                         else:
@@ -450,7 +451,8 @@ async def process_retroactive_lyrics_async(
                                     display_name,
                                     "ATUALIZADO",
                                     f"Letra original ({
-                                        orig_lang.upper()}) inserida (sem traducao no Qobuz)",
+                                        orig_lang.upper()
+                                    }) inserida (sem traducao no Qobuz)",
                                 )
                             )
                         else:
@@ -537,7 +539,8 @@ async def process_retroactive_lyrics_async(
                                     display_name,
                                     "ATUALIZADO",
                                     f"Letra original e traducao {
-                                        target_lang.upper()} inseridas diretamente (Bilingue)",
+                                        target_lang.upper()
+                                    } inseridas diretamente (Bilingue)",
                                 )
                             )
                         else:
@@ -613,7 +616,8 @@ async def process_retroactive_lyrics_async(
                                     display_name,
                                     "ATUALIZADO -> BILINGUE",
                                     f"Letra existente atualizada com a nova traducao {
-                                        target_lang.upper()} do Qobuz",
+                                        target_lang.upper()
+                                    } do Qobuz",
                                 )
                             )
                         else:
@@ -721,22 +725,40 @@ async def process_retroactive_lyrics_async(
         ui.emit(f"{BG}{CYAN} RESUMO GERAL:{RESET}")
         ui.emit(f" • Total de arquivos analisados: {stats['total']}")
         ui.emit(f" • Total de arquivos {GREEN}atualizados{OFF}: {total_updates}")
-        ui.emit(f" - Convertidos para Bilingue (adicao de traducao PT): {
-                stats['updated_to_bilingual']}")
-        ui.emit(f" - Novas letras Bilingues completas inseridas: {
-                stats['updated_bilingual_direct']}")
+        ui.emit(
+            f" - Convertidos para Bilingue (adicao de traducao PT): {
+                stats['updated_to_bilingual']
+            }"
+        )
+        ui.emit(
+            f" - Novas letras Bilingues completas inseridas: {
+                stats['updated_bilingual_direct']
+            }"
+        )
         ui.emit(f" - Novas letras no idioma alvo inseridas: {stats['updated_new_pt']}")
-        ui.emit(f" - Novas letras originais inseridas (sem traducao no Qobuz): {
-                stats['updated_new_original']}")
-        ui.emit(f" - Inseridas via fallback (Musicmatch/LRCLIB/Genius): {
-                stats['updated_fallback']}")
+        ui.emit(
+            f" - Novas letras originais inseridas (sem traducao no Qobuz): {
+                stats['updated_new_original']
+            }"
+        )
+        ui.emit(
+            f" - Inseridas via fallback (Musicmatch/LRCLIB/Genius): {
+                stats['updated_fallback']
+            }"
+        )
         if stats["corrected_wrong_language"] > 0:
-            ui.emit(f" • Total {YELLOW}corrigidas por idioma incorreto{OFF}: {
-                    stats['corrected_wrong_language']}")
-        ui.emit(f" • Total {CYAN}sem alteracoes necessarias{OFF}: {
-                stats['unchanged_already_bilingual'] +
-                stats['unchanged_already_pt'] +
-                stats['unchanged_no_trans_yet']}")
+            ui.emit(
+                f" • Total {YELLOW}corrigidas por idioma incorreto{OFF}: {
+                    stats['corrected_wrong_language']
+                }"
+            )
+        ui.emit(
+            f" • Total {CYAN}sem alteracoes necessarias{OFF}: {
+                stats['unchanged_already_bilingual']
+                + stats['unchanged_already_pt']
+                + stats['unchanged_no_trans_yet']
+            }"
+        )
         ui.emit(
             f" • Total {YELLOW}sem letra/traducao encontrada{OFF}: {stats['not_found']}"
         )

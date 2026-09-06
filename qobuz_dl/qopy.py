@@ -198,8 +198,9 @@ class Client:
                 logger.info(f"{GREEN}Logado: OK (Assinatura: {self.label}){OFF}")
             else:
                 logger.warning(
-                    f"{YELLOW}[!] Logado: OK, mas a assinatura está {RED}INATIVA{RESET} ({
-                        sub['status']}){OFF}"
+                    f"{YELLOW}[!] Logado: OK, mas a assinatura está {RED}INATIVA{
+                        RESET
+                    } ({sub['status']}){OFF}"
                 )
         except Exception:
             logger.info(f"{YELLOW}[!] Validação do perfil ignorada.{OFF}")
@@ -452,10 +453,13 @@ class Client:
         ]:
             method, req_kwargs = "post", {"data": params}
         elif epoint == "session/start":
-            method, req_kwargs = "post", {
-                "data": params,
-                "headers": {"Content-Type": "application/x-www-form-urlencoded"},
-            }
+            method, req_kwargs = (
+                "post",
+                {
+                    "data": params,
+                    "headers": {"Content-Type": "application/x-www-form-urlencoded"},
+                },
+            )
         else:
             method, req_kwargs = "get", {"params": params}
 
@@ -815,8 +819,11 @@ class Client:
         """
         sub_info = self.check_subscription()
         if not sub_info["is_active"]:
-            raise NoActiveSubscriptionError(f"Assinatura inativa ou expirada ({
-                sub_info['status']}). Download bloqueado.")
+            raise NoActiveSubscriptionError(
+                f"Assinatura inativa ou expirada ({
+                    sub_info['status']
+                }). Download bloqueado."
+            )
 
         if int(fmt_id) == 5:
             return await self.api_call("track/getFileUrl", id=id, fmt_id=fmt_id)

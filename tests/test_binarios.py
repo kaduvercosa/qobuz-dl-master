@@ -76,7 +76,7 @@ class TestEncontrarBinario:
         monkeypatch.setattr(
             utils.shutil,
             "which",
-            lambda n, path=None, **k: (str(falso) if path == str(bin_dir) else None),
+            lambda n, path=None, **k: str(falso) if path == str(bin_dir) else None,
         )
         monkeypatch.setattr(utils, "_DIRS_EXTRA", [str(bin_dir)])
 

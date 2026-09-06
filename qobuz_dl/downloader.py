@@ -101,8 +101,11 @@ def create_missing_placeholder(track: dict, folder_path: str, reason: str):
     except Exception as e:
         # Best-effort: o placeholder .missing.txt e' so' um marcador
         # informativo, nao deve derrubar o download por causa dele.
-        logger.debug(f"Falha ao criar {
-            file_path if 'file_path' in locals() else '.missing.txt'}: {e}")
+        logger.debug(
+            f"Falha ao criar {
+                file_path if 'file_path' in locals() else '.missing.txt'
+            }: {e}"
+        )
 
 
 class _PermanentDownloadError(Exception):
@@ -490,7 +493,7 @@ class Download:
             album_meta.get("release_type") != "album"
             or album_meta.get("artist").get("name") == "Various Artists"
         ):
-            ui.skip(f'Ignorando Single/EP/VA: {album_meta.get("title", "n/a")}')
+            ui.skip(f"Ignorando Single/EP/VA: {album_meta.get('title', 'n/a')}")
             return
 
         album_title = _get_title(album_meta)
@@ -1445,16 +1448,17 @@ class Download:
                                 )
                                 ui.error(
                                     "Download segmentado falhou no tier "
-                                    f"{TIER_NAMES.get(attempt_fmt,
-                                                      attempt_fmt)}: {seg_e}"
+                                    f"{TIER_NAMES.get(attempt_fmt, attempt_fmt)}: {
+                                        seg_e
+                                    }"
                                 )
                                 continue
                         else:
                             ui.error(
                                 "Nenhum formato valido retornado pelo servidor "
                                 f"para o tier {
-                                    TIER_NAMES.get(
-                                        attempt_fmt, attempt_fmt)}."
+                                    TIER_NAMES.get(attempt_fmt, attempt_fmt)
+                                }."
                             )
                             continue
 
@@ -1549,14 +1553,16 @@ class Download:
                 if original_lang:
                     if original_lang.lower() == translation_lang.lower():
                         translation_note = (
-                            f"    ℹ️ Letras já em {GREEN}{
-                                translation_lang.upper()}{RESET} "
+                            f"    ℹ️ Letras já em {GREEN}{translation_lang.upper()}{
+                                RESET
+                            } "
                             f"-- sem necessidade de tradução."
                         )
                     else:
                         translation_note = (
-                            f"    ℹ️ Nenhuma tradução em {RED}{
-                                translation_lang.upper()}{RESET} "
+                            f"    ℹ️ Nenhuma tradução em {RED}{translation_lang.upper()}{
+                                RESET
+                            } "
                             f"disponivel no Qobuz ainda para esta faixa."
                         )
 
@@ -1648,7 +1654,7 @@ class Download:
             "track_id": track_metadata.get("id"),
             "track_artist": track_artist,
             "track_composer": _safe_get(track_metadata, "composer", "name"),
-            "track_number": f'{track_metadata.get("track_number", 0):02}',
+            "track_number": f"{track_metadata.get('track_number', 0):02}",
             "isrc": track_metadata.get("isrc"),
             "bit_depth": track_metadata.get("maximum_bit_depth"),
             "sampling_rate": track_metadata.get("maximum_sampling_rate"),
@@ -1656,7 +1662,7 @@ class Download:
             "track_title_base": track_metadata.get("title"),
             "version": track_metadata.get("version"),
             "year": track_metadata.get("release_date_original", "").split("-")[0],
-            "disc_number": f'{track_metadata.get("media_number"):02}',
+            "disc_number": f"{track_metadata.get('media_number'):02}",
             "release_date": track_metadata.get("release_date_original"),
             "ExplicitFlag": "[E]" if track_metadata.get("parental_warning") else "",
             "explicit": "[E]" if track_metadata.get("parental_warning") else "",
@@ -2202,7 +2208,8 @@ async def tqdm_download(
                         if r.status_code in (401, 403, 451):
                             raise _PermanentDownloadError(
                                 f"HTTP {
-                                    r.status_code}: faixa indisponivel (bloqueio de "
+                                    r.status_code
+                                }: faixa indisponivel (bloqueio de "
                                 f"região, direitos autorais ou sessão expirada)."
                             )
                         if r.status_code not in [200, 206]:
@@ -2724,7 +2731,6 @@ async def tqdm_download_segments(
                 dynamic_ncols=dynamic_ncols,
                 disable=is_parallel,
             ) as bar:
-
                 segment_uuid = None
 
                 for i in range(2):
@@ -2884,7 +2890,7 @@ async def _download_goodies(
             if not goody.get("url"):
                 continue
             goody_name = sanitize_filename(
-                clean_filename(f'{album_meta.get("title")} ({goody.get("id")}).pdf')
+                clean_filename(f"{album_meta.get('title')} ({goody.get('id')}).pdf")
             )
             await _get_extra(
                 goody.get("url"),
