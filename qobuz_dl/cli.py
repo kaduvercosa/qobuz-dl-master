@@ -1167,9 +1167,12 @@ async def async_main():
     if offline_command == "inspect":
         from qobuz_dl.inspector import run_inspector
 
-        sys.exit(
-            await run_inspector(getattr(offline_args, "caminho", None) or os.getcwd())
-        )
+        # ANTES: "... or os.getcwd()" -- sempre entregava algo "verdadeiro"
+        # pro run_inspector, então o `if not diretorio_inicial:` dele (que
+        # decide a pasta pelo dispositivo -- iOS/Android/Windows/macOS)
+        # nunca disparava. Agora None passa como None de verdade quando a
+        # pessoa não digita nada.
+        sys.exit(await run_inspector(getattr(offline_args, "caminho", None)))
 
     config = configparser.ConfigParser(interpolation=None)
     config.read(CONFIG_FILE, encoding="utf-8")

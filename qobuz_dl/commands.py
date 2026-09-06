@@ -690,7 +690,7 @@ def stats_args(subparsers):
     return stats
 
 
-def inspect_args(subparsers, default_folder=None):
+def inspect_args(subparsers):
     inspect = subparsers.add_parser(
         "inspect",
         usage="qobuz-dl inspect [caminho]",
@@ -705,8 +705,17 @@ def inspect_args(subparsers, default_folder=None):
     inspect.add_argument(
         "caminho",
         nargs="?",
-        default=default_folder,
-        help="pasta onde começar a navegação (padrão: sua pasta de downloads)",
+        default=None,
+        # ANTES: default=default_folder (a pasta de DOWNLOADS, tipo
+        # "QobuzDownloads" relativo -- pensada pra onde arquivos NOVOS são
+        # salvos, não pra onde a biblioteca de música da pessoa já mora).
+        # Isso preenchia `caminho` antes mesmo de chegar em run_inspector(),
+        # o que por sua vez nunca deixava a detecção de pasta por
+        # dispositivo (_detectar_pasta_padrao() em inspector.py --
+        # iOS/Android/Windows/macOS) rodar de verdade. Agora fica None de
+        # propósito quando a pessoa não digita nada, pra essa detecção
+        # continuar valendo.
+        help="pasta onde começar a navegação (padrão: detecta pelo dispositivo)",
     )
     return inspect
 
@@ -785,7 +794,7 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder=None):
     lyrics_cmd = lyrics_args(subparsers, default_folder=default_folder)
     sync_pl_cmd = sync_playlist_args(subparsers)
     stats = stats_args(subparsers)
-    inspect_cmd = inspect_args(subparsers, default_folder=default_folder)
+    inspect_cmd = inspect_args(subparsers)
     auth_cmd = auth_args(subparsers)
     user_cmd = user_args(subparsers)
 
