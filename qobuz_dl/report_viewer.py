@@ -214,17 +214,13 @@ def renderizar_html(report: dict) -> str:
 
     linha_extra = []
     if extra.get("rotulo"):
-        linha_extra.append(
-            f'<div class="meta-row"><span class="meta-glyph">▪</span>{
-                esc(extra["rotulo"])
-            }</div>'
-        )
+        linha_extra.append(f'<div class="meta-row"><span class="meta-glyph">▪</span>{
+            esc(extra["rotulo"])
+        }</div>')
     if extra.get("genero"):
-        linha_extra.append(
-            f'<div class="meta-row"><span class="meta-glyph">▪</span>{
-                esc(extra["genero"])
-            }</div>'
-        )
+        linha_extra.append(f'<div class="meta-row"><span class="meta-glyph">▪</span>{
+            esc(extra["genero"])
+        }</div>')
     if extra.get("url") or ident.get("url"):
         url = extra.get("url") or ident.get("url")
         linha_extra.append(
@@ -241,8 +237,8 @@ def renderizar_html(report: dict) -> str:
     mostrar_artista_col = len(artistas_distintos) > 1
 
     faixas_html = (
-        "".join(_renderizar_faixa(f, mostrar_artista_col) for f in faixas)
-        or '<div class="empty">Nenhuma faixa registrada ainda.</div>'
+        "".join(_renderizar_faixa(f, mostrar_artista_col) for f in faixas) or
+        '<div class="empty">Nenhuma faixa registrada ainda.</div>'
     )
 
     resumo_stats = "".join(

@@ -299,10 +299,26 @@ def _reset_config(config_file: str):
 
     genius_token = ""
     if config["qobuz"]["fetch_lyrics"] == "true":
+        # 1. Pergunta o Idioma primeiro
+        ui.emit(f"\n{C_ACCENT}[?] Idioma de Tradução de Letras:{OFF}")
+        ui.emit(
+            "    Opções: pt (Português), en (Inglês), es (Espanhol), fr (Francês), original (Manter nativo)"
+        )
+        lang_choice = input("    Idioma [Padrão: pt]:\n- ").strip().lower()
+        if lang_choice in ["original", "orig"]:
+            config["qobuz"]["lyrics_translation_lang"] = ""
+        elif lang_choice in ["pt", "en", "es", "fr", "de", "it"]:
+            config["qobuz"]["lyrics_translation_lang"] = lang_choice
+        else:
+            config["qobuz"]["lyrics_translation_lang"] = "pt"
+
+        # 2. Pergunta o token do Genius depois
         ui.emit(
             f"\n{C_ACCENT}[!] Para usar o Genius como fallback, insira seu API Token (Enter para pular e usar apenas LRCLIB):{OFF}"
         )
         genius_token = input("Genius API Token:\n- ").strip()
+    else:
+        config["qobuz"]["lyrics_translation_lang"] = "pt"
 
     if use_keyring and _keyring_save("genius_token", genius_token):
         config["qobuz"]["genius_token"] = ""
@@ -310,18 +326,18 @@ def _reset_config(config_file: str):
         config["qobuz"]["genius_token"] = genius_token
 
     config["qobuz"]["directory"] = (
-        input("\nPasta de download (pressione Enter para 'Qobuz Downloads')\n- ")
-        or "Qobuz Downloads"
+        input("\nPasta de download (pressione Enter para 'Qobuz Downloads')\n- ") or
+        "Qobuz Downloads"
     )
     config["qobuz"]["folder_format"] = (
-        input(f"\nFormato da pasta (pressione Enter para '{DEFAULT_FOLDER}')\n- ")
-        or DEFAULT_FOLDER
+        input(f"\nFormato da pasta (pressione Enter para '{DEFAULT_FOLDER}')\n- ") or
+        DEFAULT_FOLDER
     )
     config["qobuz"]["default_quality"] = (
         input(
             "\nQualidade (5:MP3 320k, 6:FLAC 16-bit, 7:Hi-Res 24b<=96kHz, 27:Hi-Res Max) [Padrão 27]\n- "
-        )
-        or "27"
+        ) or
+        "27"
     )
 
     config["qobuz"]["default_limit"] = "500"
@@ -338,20 +354,8 @@ def _reset_config(config_file: str):
     config["qobuz"]["legacy_charmap"] = "false"
     config["qobuz"]["blacklist"] = "blacklist.txt"
 
-    ui.emit(f"\n{C_ACCENT}[?] Idioma de Tradução de Letras:{OFF}")
-    ui.emit(
-        "    Opções: pt (Português), en (Inglês), es (Espanhol), fr (Francês), original (Manter nativo)"
-    )
-    lang_choice = input("    Idioma [Padrão: pt]:\n- ").strip().lower()
-    if lang_choice in ["original", "orig"]:
-        config["qobuz"]["lyrics_translation_lang"] = ""
-    elif lang_choice in ["pt", "en", "es", "fr", "de", "it"]:
-        config["qobuz"]["lyrics_translation_lang"] = lang_choice
-    else:
-        config["qobuz"]["lyrics_translation_lang"] = "pt"
-
     logging.info(
-        f"\n{C_ACCENT}Obtendo credenciais da API via bundle.js... Por favor, aguarde.{OFF}"
+        f"\n{C_ACCENT}Obtendo credenciais da API via [bundle.js]. Por favor, aguarde...{OFF}"
     )
     bundle = Bundle()
     config["qobuz"]["app_id"] = str(bundle.get_app_id())
@@ -384,9 +388,9 @@ def _reset_config(config_file: str):
     config["qobuz"]["saved_art_size"] = "org"
     config["qobuz"]["multiple_disc_prefix"] = "CD"
     config["qobuz"]["multiple_disc_one_dir"] = "false"
-    config["qobuz"]["multiple_disc_track_format"] = (
-        "{disc_number}.{track_number} - {track_title}"
-    )
+    config["qobuz"][
+        "multiple_disc_track_format"
+    ] = "{disc_number}.{track_number} - {track_title}"
     config["qobuz"]["max_workers"] = "1"
     config["qobuz"]["user_auth_token"] = ""
 
@@ -595,28 +599,22 @@ async def _auth_command(
 
         ui.emit(f"\n {CYAN}[👤 PERFIL DO USUÁRIO]{OFF}")
         nome_completo = (
-            f"{user_info.get('firstname', '')} {user_info.get('lastname', '')}".strip()
-            or "N/A"
+            f"{user_info.get('firstname', '')} {user_info.get('lastname', '')}".strip() or
+            "N/A"
         )
         ui.emit(f"   • Nome Completo:     {nome_completo}")
         ui.emit(f"   • Display Name:      {user_info.get('display_name', 'N/A')}")
         ui.emit(f"   • E-mail:            {user_info.get('email', 'N/A')}")
         ui.emit(f"   • Login:             {user_info.get('login', 'N/A')}")
-        ui.emit(
-            f"   • ID do Usuário:     {user_info.get('id', 'N/A')} [Public ID: {
+        ui.emit(f"   • ID do Usuário:     {user_info.get('id', 'N/A')} [Public ID: {
                 user_info.get('publicId', 'N/A')
-            }]"
-        )
-        ui.emit(
-            f"   • País / Zona:       {user_info.get('country', 'N/A')} / {
+                }]")
+        ui.emit(f"   • País / Zona:       {user_info.get('country', 'N/A')} / {
                 user_info.get('zone', 'N/A')
-            }"
-        )
-        ui.emit(
-            f"   • Loja / Idioma:     {user_info.get('store', 'N/A')} ({
+                }")
+        ui.emit(f"   • Loja / Idioma:     {user_info.get('store', 'N/A')} ({
                 user_info.get('language_code', 'N/A')
-            })"
-        )
+                })")
 
         def format_date_br(d_str):
             if not d_str:
@@ -638,78 +636,54 @@ async def _auth_command(
         )
 
         ui.emit(f"\n {CYAN}[💳 STATUS DA SUBSCRIÇÃO (ASSINATURA)]{OFF}")
-        ui.emit(
-            f"   • Status Atual:      {status_color}● {
+        ui.emit(f"   • Status Atual:      {status_color}● {
                 str(sub_info.get('status')).upper()
-            }{OFF}"
-        )
+                }{OFF}")
         ui.emit(f"   • Plano / Oferta:    {sub_info.get('offer', 'N/A')}")
-        ui.emit(
-            f"   • Periodicidade:     {
+        ui.emit(f"   • Periodicidade:     {
                 str(sub_info.get('periodicity', 'N/A')).capitalize()
-            }"
-        )
+                }")
         ui.emit(f"   • Data de Início:    {sub_info.get('start_date') or 'N/A'}")
         ui.emit(f"   • Data de Término:   {sub_info.get('end_date') or 'N/A'}")
-        ui.emit(
-            f"   • Cancelamento:      {
+        ui.emit(f"   • Cancelamento:      {
                 'Sim (Cancelada pelo usuário)' if sub_info.get('is_canceled') else 'Não'
-            }"
-        )
+                }")
         ui.emit(
             f"   • Vagas Família:     {sub_info.get('household_size_max')} membro(s)"
         )
 
         ui.emit(f"\n {CYAN}[🎛️ CREDENCIAL & RECURSOS DA CONTA]{OFF}")
         ui.emit(f"   • Tipo de Membro:    {cred.get('description', 'Membro Qobuz')}")
-        ui.emit(
-            f"   • Streaming:         {
+        ui.emit(f"   • Streaming:         {
                 'Disponível' if sf.get('streaming') else 'Indisponível'
-            }"
-        )
-        ui.emit(
-            f"   • Letras (Lyrics):   {
+                }")
+        ui.emit(f"   • Letras (Lyrics):   {
                 'Disponível' if sf.get('lyrics') else 'Indisponível'
-            }"
-        )
-        ui.emit(
-            f"   • Importação Músicas:{
+                }")
+        ui.emit(f"   • Importação Músicas:{
                 'Disponível' if sf.get('music_import') else 'Indisponível'
-            }"
-        )
-        ui.emit(
-            f"   • Rádio / Club / Q:  {
+                }")
+        ui.emit(f"   • Rádio / Club / Q:  {
                 'Disponível' if sf.get('radio') or sf.get('club') else 'Indisponível'
-            }"
-        )
+                }")
 
         if last_update:
             ui.emit(f"\n {CYAN}[📊 ATIVIDADES & ÚLTIMAS ATUALIZAÇÕES]{OFF}")
-            ui.emit(
-                f"   • Playlists:         {
+            ui.emit(f"   • Playlists:         {
                     _format_timestamp(last_update.get('playlist'))
-                }"
-            )
-            ui.emit(
-                f"   • Álbuns Favoritos:  {
+                    }")
+            ui.emit(f"   • Álbuns Favoritos:  {
                     _format_timestamp(last_update.get('favorite_album'))
-                }"
-            )
-            ui.emit(
-                f"   • Faixas Favoritas:  {
+                    }")
+            ui.emit(f"   • Faixas Favoritas:  {
                     _format_timestamp(last_update.get('favorite_track'))
-                }"
-            )
-            ui.emit(
-                f"   • Artistas Favoritos:{
+                    }")
+            ui.emit(f"   • Artistas Favoritos:{
                     _format_timestamp(last_update.get('favorite_artist'))
-                }"
-            )
-            ui.emit(
-                f"   • Compras na Loja:   {
+                    }")
+            ui.emit(f"   • Compras na Loja:   {
                     _format_timestamp(last_update.get('purchase'))
-                }"
-            )
+                    }")
 
         # Se a assinatura estiver inativa e não acabamos de atualizar:
         if not sub_info.get("is_active"):
@@ -768,19 +742,15 @@ async def _garantir_assinatura_ativa(qobuz: QobuzDL) -> bool:
     while not sub_info.get("is_active"):
         ui.error("CONTA SEM ASSINATURA ATIVA NO QOBUZ")
         ui.emit(f" {CYAN}•{OFF} Status Atual:       {RED}{sub_info.get('status')}{OFF}")
-        ui.emit(
-            f" {CYAN}•{OFF} Plano:              {sub_info.get('offer', 'N/A')} ({
+        ui.emit(f" {CYAN}•{OFF} Plano:              {sub_info.get('offer', 'N/A')} ({
                 str(sub_info.get('periodicity', 'N/A')).capitalize()
-            })"
-        )
+                })")
         ui.emit(
             f" {CYAN}•{OFF} Validade / Término: {sub_info.get('end_date') or 'N/A'}"
         )
-        ui.emit(
-            f" {CYAN}•{OFF} Cancelamento:       {
+        ui.emit(f" {CYAN}•{OFF} Cancelamento:       {
                 'Sim (Cancelada)' if sub_info.get('is_canceled') else 'Não'
-            }"
-        )
+                }")
         ui.warn(
             "ℹ️  Sem uma assinatura ativa, a API da Qobuz não permite o download "
             "de faixas completas. É obrigatório informar o e-mail e o user_token "
@@ -1553,8 +1523,8 @@ async def async_main():
         ),
         folder_format=getattr(arguments, "folder_format", None) or folder_format,
         track_format=getattr(arguments, "track_format", None) or track_format,
-        smart_discography=getattr(arguments, "smart_discography", False)
-        or smart_discography,
+        smart_discography=getattr(arguments, "smart_discography", False) or
+        smart_discography,
         fetch_lyrics=fetch_lyrics,
         no_lrc_files=not settings.lrc_files,
         genius_token=genius_token,
@@ -1563,8 +1533,8 @@ async def async_main():
         settings=settings,
         booklet_only=getattr(arguments, "booklet_only", False),
         blacklist=getattr(arguments, "blacklist", None) or blacklist_config,
-        playlist_as_albums=getattr(arguments, "playlist_as_albums", False)
-        or playlist_as_albums_config,
+        playlist_as_albums=getattr(arguments, "playlist_as_albums", False) or
+        playlist_as_albums_config,
     )
 
     if arguments.command not in (

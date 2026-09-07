@@ -1,4 +1,4 @@
-# PARA TESTAR USE: python3 -m tests.test_lyrics
+# PARA TESTAR USE: python3 -m tests.manual.verificar_letras_qobuz
 import asyncio
 import configparser
 import os
@@ -137,7 +137,7 @@ async def main():
     client = await Client.create(email, pwd, app_id, secrets, user_auth_token=token)
 
     try:
-        print("\n[1/3] Obtendo informações originais da faixa...")
+        print(f"\n[1/3] Obtendo informações originais da faixa...")
 
         # Requisição ORIGINAL com assinatura manual forte
         params_orig = {"track_id": item_id}

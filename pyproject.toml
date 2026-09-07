@@ -105,12 +105,37 @@ minversion = "8.0"
 testpaths = ["tests"]
 
 norecursedirs = ["manual", ".git", "__pycache__", "build", "dist"]
-addopts = "-ra --strict-markers --strict-config"
+addopts = """
+    -ra
+    --strict-markers
+    --strict-config
+    --tb=short
+    -v
+"""
+# -v      -> nome completo de cada teste (TestClasse::test_metodo) com PASSED/FAILED
+# -ra     -> resumo de tudo que nao passou (skips, falhas, erros) no final
+# --tb=short -> traceback curto: so a linha que falhou + o assert, sem todo
+#              o frame interno do pytest que nao diz nada ao desenvolvedor
+
 markers = [
-    "slow: abre subprocesso do programa; mais lento que os testes de unidade",
+    "slow: abre subprocesso ou espera I/O real; pule com -m 'not slow' no dia a dia",
+    "integration: toca o sistema de arquivos real ou a API; requer credenciais",
+    "asyncio: marca corotinas de teste (gerenciado automaticamente pelo pytest-asyncio)",
 ]
 
 asyncio_mode = "auto"
+
+# Filtra avisos barulhentos que nao sao bugs do projeto
+filterwarnings = [
+    "ignore::DeprecationWarning:httpx",
+    "ignore::DeprecationWarning:tqdm",
+    "ignore::PendingDeprecationWarning",
+]
+
+# Exibe os 10 testes mais lentos quando a suite inteira roda
+# (util para perceber quando um teste unitario virou lento sem querer)
+# Ative com: pytest --durations=10
+# durations = 10
 
 [tool.ruff]
 target-version = "py312"

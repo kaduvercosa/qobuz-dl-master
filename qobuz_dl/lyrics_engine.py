@@ -294,8 +294,8 @@ class LyricsEngine:
                     if (
                         data_token.get("message", {})
                         .get("header", {})
-                        .get("status_code")
-                        == 200
+                        .get("status_code") ==
+                        200
                     ):
                         self._mxm_token = data_token["message"]["body"]["user_token"]
 
@@ -317,20 +317,20 @@ class LyricsEngine:
                 if resp_lyric.status_code == 200:
                     data = resp_lyric.json()
                     if (
-                        data.get("message", {}).get("header", {}).get("status_code")
-                        == 200
+                        data.get("message", {}).get("header", {}).get("status_code") ==
+                        200
                     ):
                         body = data["message"]["body"]
                         if (
-                            "macro_calls" in body
-                            and "track.subtitles.get" in body["macro_calls"]
+                            "macro_calls" in body and
+                            "track.subtitles.get" in body["macro_calls"]
                         ):
                             sub_msg = body["macro_calls"]["track.subtitles.get"][
                                 "message"
                             ]
                             if (
-                                sub_msg["header"]["status_code"] == 200
-                                and "subtitle_list" in sub_msg["body"]
+                                sub_msg["header"]["status_code"] == 200 and
+                                "subtitle_list" in sub_msg["body"]
                             ):
                                 subtitle_list = sub_msg["body"]["subtitle_list"]
                                 if subtitle_list:

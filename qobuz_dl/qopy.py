@@ -73,7 +73,7 @@ class Client:
         Fábrica assíncrona. Inicializa o cliente API e configura a sessão resiliente.
         """
         self = cls()
-        ui.emit(f"{YELLOW}Logando...{OFF}", end="")
+        print(f"{YELLOW}Logando...{OFF}", end="", flush=True)
         self.secrets = secrets
         self.id = str(app_id)
         self.force_english = force_english
@@ -87,15 +87,15 @@ class Client:
                         self.id = fresh_id
                         self.secrets = list(b.get_secrets().values())
                         logger.info(
-                            f"\r{GREEN}[+] ID do aplicativo atualizado dinamicamente: {self.id}{OFF}\033[K"
+                            f"\r{GREEN}[+] ID atualizado dinamicamente: {self.id}{OFF}\033[K"
                         )
                 except Exception:
                     ui.emit(
-                        f"\r{YELLOW} [!] ID do aplicativo não atualizado (usando padrão).{OFF}\033[K"
+                        f"\r{YELLOW} [!] ID não atualizado (usando padrão).{OFF}\033[K"
                     )
         else:
             logger.info(
-                f"\r{GREEN}[+] Usando ID de aplicativo legado personalizado: {self.id}{OFF}\033[K"
+                f"\r{GREEN}[+] Usando ID legado personalizado: {self.id}{OFF}\033[K"
             )
 
         headers = {}
@@ -501,8 +501,8 @@ class Client:
                         "favorite/getUserFavorites",
                         "file/url",
                         "track/lyricsUrl",
-                    ]
-                    and resp.status_code == 400
+                    ] and
+                    resp.status_code == 400
                 ):
                     body = resp.json()
                     raise InvalidAppSecretError(
@@ -570,9 +570,9 @@ class Client:
                 highest_ratio = 0.0
 
                 if (
-                    search_results
-                    and "tracks" in search_results
-                    and search_results["tracks"]["items"]
+                    search_results and
+                    "tracks" in search_results and
+                    search_results["tracks"]["items"]
                 ):
                     for q_track in search_results["tracks"]["items"]:
                         q_artist_raw = q_track.get("performer", {}).get(
@@ -693,8 +693,8 @@ class Client:
 
         if isrc_hits or isrc_misses:
             logger.info(
-                f"{GREEN}[+] ISRC: {isrc_hits} match(es) exato(s){OFF}"
-                + (
+                f"{GREEN}[+] ISRC: {isrc_hits} match(es) exato(s){OFF}" +
+                (
                     f", {YELLOW}{isrc_misses} miss(es) → fuzzy fallback{OFF}"
                     if isrc_misses
                     else ""
@@ -752,7 +752,7 @@ class Client:
         BATCH = 50
         success = True
         for i in range(0, len(track_ids), BATCH):
-            batch = track_ids[i : i + BATCH]
+            batch = track_ids[i: i + BATCH]
             try:
                 await self.api_call(
                     "playlist/addTracks",
@@ -819,11 +819,9 @@ class Client:
         """
         sub_info = self.check_subscription()
         if not sub_info["is_active"]:
-            raise NoActiveSubscriptionError(
-                f"Assinatura inativa ou expirada ({
-                    sub_info['status']
-                }). Download bloqueado."
-            )
+            raise NoActiveSubscriptionError(f"Assinatura inativa ou expirada ({
+                sub_info['status']
+            }). Download bloqueado.")
 
         if int(fmt_id) == 5:
             return await self.api_call("track/getFileUrl", id=id, fmt_id=fmt_id)

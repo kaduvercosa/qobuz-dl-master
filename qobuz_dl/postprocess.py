@@ -89,6 +89,7 @@ def _load_report(path: str) -> dict:
 
 def _atomic_write_json(path: str, data: Any) -> None:
     """Grava JSON de forma atomica."""
+    os.makedirs(os.path.dirname(os.path.abspath(path)), exist_ok=True)
     tmp_path = f"{path}.tmp"
     with open(tmp_path, "w", encoding="utf-8") as file:
         json.dump(data, file, ensure_ascii=False, indent=2)
@@ -259,7 +260,9 @@ def _criar_faixa_pendente(faixa: dict) -> dict:
 
     return {
         "numero": faixa.get("numero"),
-        "id": faixa.get("id"),
+        # IDs da API podem chegar como int, mas URLs/update usam str.
+        # O relatório deve ter uma representação canônica única.
+        "id": _norm_id(faixa.get("id")),
         "identificacao": {
             "titulo": faixa.get("titulo", "Faixa"),
             "main_artists": artistas,
@@ -645,13 +648,13 @@ def _recalc_cabecalho_dinamico(report: dict) -> None:
 
     artistas = {
         (
-            f.get("identificacao", {}).get("artista_album")
-            or f.get("identificacao", {}).get("artista")
+            f.get("identificacao", {}).get("artista_album") or
+            f.get("identificacao", {}).get("artista")
         )
         for f in faixas
         if (
-            f.get("identificacao", {}).get("artista_album")
-            or f.get("identificacao", {}).get("artista")
+            f.get("identificacao", {}).get("artista_album") or
+            f.get("identificacao", {}).get("artista")
         )
     }
     if len(artistas) == 1:
@@ -668,6 +671,41 @@ def _recalc_cabecalho_dinamico(report: dict) -> None:
         identificacao["tipo_lancamento"] = next(iter(tipos))
     elif len(tipos) > 1:
         identificacao["tipo_lancamento"] = "Diversos"
+
+
+def _aplicar_compatibilidade_legada(report: dict) -> None:
+    """Mantém aliases planos para consumidores da API anterior.
+
+    A estrutura canônica continua sendo a aninhada; os campos abaixo
+    preservam compatibilidade com integrações e testes que ainda leem
+    o formato legado.
+    """
+    ident = report.get("identificacao", {})
+    report["titulo"] = ident.get("titulo", "")
+    report["artista"] = ident.get("artista", "")
+    report["id"] = ident.get("id", "")
+
+    estado = report.get("progresso", {}).get("estado", {})
+    report["estado"] = estado.get("situacao", "em_andamento")
+
+    resumo = report.get("progresso", {}).get("resumo", {})
+    resumo_legacy = dict(resumo)
+    resumo_legacy["baixadas"] = resumo.get("concluidas", 0)
+    report["resumo"] = resumo_legacy
+
+    report["qualidade_atingida"] = report.get("qualidade", {}).get("alvo_atingida")
+
+    for faixa in report.get("faixas", []):
+        identificacao = faixa.get("identificacao", {})
+        download = faixa.get("download", {})
+
+        situacao = download.get("situacao", "pendente")
+        faixa["status"] = "ok" if situacao == "concluido" else situacao
+        faixa["motivo"] = download.get("motivo", "")
+
+        for chave in ("isrc", "compositor", "titulo", "artista"):
+            if chave in identificacao:
+                faixa[chave] = identificacao[chave]
 
 
 def _organizar_report(report: dict) -> dict:
@@ -730,6 +768,7 @@ def _save_report(path: str, report: dict) -> None:
     qualquer motivo, so' loga e segue, nunca derruba o download por
     causa disso.
     """
+    _aplicar_compatibilidade_legada(report)
     organizado = _organizar_report(report)
     _atomic_write_json(path, organizado)
 
