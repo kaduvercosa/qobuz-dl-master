@@ -648,13 +648,13 @@ def _recalc_cabecalho_dinamico(report: dict) -> None:
 
     artistas = {
         (
-            f.get("identificacao", {}).get("artista_album")
-            or f.get("identificacao", {}).get("artista")
+            f.get("identificacao", {}).get("artista_album") or
+            f.get("identificacao", {}).get("artista")
         )
         for f in faixas
         if (
-            f.get("identificacao", {}).get("artista_album")
-            or f.get("identificacao", {}).get("artista")
+            f.get("identificacao", {}).get("artista_album") or
+            f.get("identificacao", {}).get("artista")
         )
     }
     if len(artistas) == 1:

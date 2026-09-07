@@ -249,8 +249,8 @@ async def process_retroactive_lyrics_async(
                     audio = FLAC(file_path)
                     title = audio.get("TITLE", [""])[0]
                     artist = (
-                        audio.get("ARTIST", [""])[0]
-                        or audio.get("ALBUMARTIST", [""])[0]
+                        audio.get("ARTIST", [""])[0] or
+                        audio.get("ALBUMARTIST", [""])[0]
                     )
                     album = audio.get("ALBUM", [""])[0]
                 except Exception as e:
@@ -296,9 +296,9 @@ async def process_retroactive_lyrics_async(
                             target_title in item_title or item_title in target_title
                         )
                         artist_matches = (
-                            not target_artist
-                            or target_artist in item_artist
-                            or item_artist in target_artist
+                            not target_artist or
+                            target_artist in item_artist or
+                            item_artist in target_artist
                         )
 
                         if title_matches and artist_matches:
@@ -378,10 +378,10 @@ async def process_retroactive_lyrics_async(
                             )
 
                     elif (
-                        not existing_lang
-                        or existing_lang == "unknown"
-                        or existing_lang != expected_lang
-                        or upgrade_to_sync
+                        not existing_lang or
+                        existing_lang == "unknown" or
+                        existing_lang != expected_lang or
+                        upgrade_to_sync
                     ) and track_id_is_trusted:
                         result = engine.fetch_and_inject(
                             file_path=file_path,
@@ -466,10 +466,10 @@ async def process_retroactive_lyrics_async(
                             )
 
                     elif (
-                        not existing_lang
-                        or existing_lang == "unknown"
-                        or existing_lang != expected_lang
-                        or upgrade_to_sync
+                        not existing_lang or
+                        existing_lang == "unknown" or
+                        existing_lang != expected_lang or
+                        upgrade_to_sync
                     ) and track_id_is_trusted:
                         result = engine.fetch_and_inject(
                             file_path=file_path,
@@ -554,10 +554,10 @@ async def process_retroactive_lyrics_async(
                             )
 
                     elif (
-                        not existing_lang
-                        or existing_lang == "unknown"
-                        or existing_lang != expected_lang
-                        or upgrade_to_sync
+                        not existing_lang or
+                        existing_lang == "unknown" or
+                        existing_lang != expected_lang or
+                        upgrade_to_sync
                     ) and track_id_is_trusted:
                         result = engine.fetch_and_inject(
                             file_path=file_path,
@@ -714,11 +714,11 @@ async def process_retroactive_lyrics_async(
 
         # Soma somente operacoes que alteraram ou inseriram letras.
         total_updates = (
-            stats["updated_new_original"]
-            + stats["updated_new_pt"]
-            + stats["updated_to_bilingual"]
-            + stats["updated_bilingual_direct"]
-            + stats["updated_fallback"]
+            stats["updated_new_original"] +
+            stats["updated_new_pt"] +
+            stats["updated_to_bilingual"] +
+            stats["updated_bilingual_direct"] +
+            stats["updated_fallback"]
         )
 
         ui.emit(f"{CYAN}{'─' * _w}{RESET}")
@@ -754,9 +754,9 @@ async def process_retroactive_lyrics_async(
             )
         ui.emit(
             f" • Total {CYAN}sem alteracoes necessarias{OFF}: {
-                stats['unchanged_already_bilingual']
-                + stats['unchanged_already_pt']
-                + stats['unchanged_no_trans_yet']
+                stats['unchanged_already_bilingual'] +
+                stats['unchanged_already_pt'] +
+                stats['unchanged_no_trans_yet']
             }"
         )
         ui.emit(

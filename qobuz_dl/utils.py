@@ -167,9 +167,9 @@ def make_m3u(pl_directory, remote_items=None):
             # Passes 1-3: buscas rápidas em dicionário, em ordem de
             # confiabilidade (ID Qobuz > ISRC > título exato).
             best_match = (
-                by_tid.get(tid)
-                or by_isrc.get(isrc)
-                or by_title.get(track_title.strip().lower())
+                by_tid.get(tid) or
+                by_isrc.get(isrc) or
+                by_title.get(track_title.strip().lower())
             )
 
             # Passe 4: fallback por substring no nome do arquivo, quando
@@ -309,12 +309,12 @@ def smart_discography_filter(
             _remaster_exists=remaster_exists,
         ) -> bool:
             return (
-                album["maximum_bit_depth"] == _bit_depth
-                and album["maximum_sampling_rate"] == _sampling_rate
-                and album["artist"]["name"] == requested_artist
-                and not (  # estados não permitidos:
-                    (_remaster_exists and not is_type("remaster", album))
-                    or (skip_extras and is_type("extra", album))
+                album["maximum_bit_depth"] == _bit_depth and
+                album["maximum_sampling_rate"] == _sampling_rate and
+                album["artist"]["name"] == requested_artist and
+                not (  # estados não permitidos:
+                    (_remaster_exists and not is_type("remaster", album)) or
+                    (skip_extras and is_type("extra", album))
                 )
             )
 
@@ -577,7 +577,7 @@ def classify_release_type(
     track_count=0,
     duration_seconds=0,
     api_release_type=None,
-    item_type="album",
+    item_type="unknown",
 ) -> str:
     """
     Classifica o tipo de release. Prioridade (do mais confiavel pro menos):

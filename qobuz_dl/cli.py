@@ -326,18 +326,18 @@ def _reset_config(config_file: str):
         config["qobuz"]["genius_token"] = genius_token
 
     config["qobuz"]["directory"] = (
-        input("\nPasta de download (pressione Enter para 'Qobuz Downloads')\n- ")
-        or "Qobuz Downloads"
+        input("\nPasta de download (pressione Enter para 'Qobuz Downloads')\n- ") or
+        "Qobuz Downloads"
     )
     config["qobuz"]["folder_format"] = (
-        input(f"\nFormato da pasta (pressione Enter para '{DEFAULT_FOLDER}')\n- ")
-        or DEFAULT_FOLDER
+        input(f"\nFormato da pasta (pressione Enter para '{DEFAULT_FOLDER}')\n- ") or
+        DEFAULT_FOLDER
     )
     config["qobuz"]["default_quality"] = (
         input(
             "\nQualidade (5:MP3 320k, 6:FLAC 16-bit, 7:Hi-Res 24b<=96kHz, 27:Hi-Res Max) [Padrão 27]\n- "
-        )
-        or "27"
+        ) or
+        "27"
     )
 
     config["qobuz"]["default_limit"] = "500"
@@ -599,8 +599,8 @@ async def _auth_command(
 
         ui.emit(f"\n {CYAN}[👤 PERFIL DO USUÁRIO]{OFF}")
         nome_completo = (
-            f"{user_info.get('firstname', '')} {user_info.get('lastname', '')}".strip()
-            or "N/A"
+            f"{user_info.get('firstname', '')} {user_info.get('lastname', '')}".strip() or
+            "N/A"
         )
         ui.emit(f"   • Nome Completo:     {nome_completo}")
         ui.emit(f"   • Display Name:      {user_info.get('display_name', 'N/A')}")
@@ -1557,8 +1557,8 @@ async def async_main():
         ),
         folder_format=getattr(arguments, "folder_format", None) or folder_format,
         track_format=getattr(arguments, "track_format", None) or track_format,
-        smart_discography=getattr(arguments, "smart_discography", False)
-        or smart_discography,
+        smart_discography=getattr(arguments, "smart_discography", False) or
+        smart_discography,
         fetch_lyrics=fetch_lyrics,
         no_lrc_files=not settings.lrc_files,
         genius_token=genius_token,
@@ -1567,8 +1567,8 @@ async def async_main():
         settings=settings,
         booklet_only=getattr(arguments, "booklet_only", False),
         blacklist=getattr(arguments, "blacklist", None) or blacklist_config,
-        playlist_as_albums=getattr(arguments, "playlist_as_albums", False)
-        or playlist_as_albums_config,
+        playlist_as_albums=getattr(arguments, "playlist_as_albums", False) or
+        playlist_as_albums_config,
     )
 
     if arguments.command not in (

@@ -101,9 +101,9 @@ def _detectar_pasta_padrao():
     # do Android (onde o usuário de fato vê "Música" no gerenciador de
     # arquivos) fica montado à parte, não dentro do HOME do Termux.
     if (
-        "com.termux" in home_dir
-        or os.environ.get("ANDROID_ROOT")
-        or os.environ.get("ANDROID_DATA")
+        "com.termux" in home_dir or
+        os.environ.get("ANDROID_ROOT") or
+        os.environ.get("ANDROID_DATA")
     ):
         candidatos.append("/storage/emulated/0/Music")
         candidatos.append("/sdcard/Music")
@@ -157,9 +157,9 @@ def _listar_diretorio(caminho):
         (
             e
             for e in brutos
-            if e.is_file(follow_symlinks=False)
-            and not e.name.startswith(".")
-            and e.name.lower().endswith(_AUDIO_EXTS)
+            if e.is_file(follow_symlinks=False) and
+            not e.name.startswith(".") and
+            e.name.lower().endswith(_AUDIO_EXTS)
         ),
         key=lambda e: e.name.lower(),
     )
@@ -682,8 +682,8 @@ def _suavizar(valores, janela=11):
         return list(valores)
     metade = janela // 2
     return [
-        sum(valores[max(0, i - metade) : min(n, i + metade + 1)])
-        / len(valores[max(0, i - metade) : min(n, i + metade + 1)])
+        sum(valores[max(0, i - metade): min(n, i + metade + 1)]) /
+        len(valores[max(0, i - metade): min(n, i + metade + 1)])
         for i in range(n)
     ]
 
@@ -768,17 +768,22 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
             f"O som continua até perto do limite máximo esperado ({nyquist_khz:.1f}kHz)",
             "sem nenhum degrau abrupto no meio do caminho.",
             "Isso é consistente com uma fonte genuinamente lossless/Hi-Res.",
+            "Na prática: vale a pena manter esse arquivo na qualidade que está.",
         ),
         "inconclusivo": (
             f"O corte em {corte_khz:.1f}kHz está um pouco abaixo do esperado",
             f"({nyquist_khz:.1f}kHz), mas não o suficiente pra ter certeza sozinho.",
             "Pode ser uma gravação/masterização real, ou uma compressão leve.",
+            "Na prática: não dá pra cravar upsample só com este teste -- se quiser",
+            "mais certeza, compare com outra fonte da mesma faixa.",
         ),
         "suspeito": (
             f"O som para de repente em {corte_khz:.1f}kHz, bem abaixo dos",
             f"{nyquist_khz:.1f}kHz que esse arquivo deveria ter.",
             "Isso é o padrão clássico de um MP3/AAC comprimido, convertido",
             "depois pra parecer um FLAC/Hi-Res.",
+            "Na prática: baixar em qualidade maior não vai trazer mais detalhe",
+            "sonoro real aqui -- só ocupa mais espaço.",
         ),
     }[veredito]
     veredito_txt = {
@@ -786,6 +791,44 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
         "inconclusivo": "INCONCLUSIVO",
         "suspeito": "SUSPEITO",
     }[veredito]
+
+    saiba_mais = (
+        (
+            "O que significa \u201clossless\u201d e \u201clossy\u201d?",
+            "Lossless (FLAC, ALAC, WAV) guarda o áudio sem descartar nenhuma "
+            "informação do original. Lossy (MP3, AAC) descarta partes do som pra "
+            "ocupar menos espaço -- geralmente as frequências mais agudas, que "
+            "são as primeiras a serem cortadas.",
+        ),
+        (
+            "O que é a \u201cfrequência de corte\u201d e o \u201cNyquist esperado\u201d?",
+            "Todo áudio digital tem um limite teórico de frequência que consegue "
+            "representar: a frequência de Nyquist, que é metade da taxa de "
+            "amostragem (sample rate). Um arquivo de 48kHz, por exemplo, pode "
+            "conter som até 24kHz. A \u201cfrequência de corte\u201d é onde o som DE "
+            "VERDADE para de existir no arquivo -- se for bem menor que o "
+            "Nyquist esperado, é sinal de que o conteúdo original já tinha "
+            "menos informação do que o arquivo promete ter.",
+        ),
+        (
+            "Por que alguém faria upsample e disfarçaria um arquivo?",
+            "Converter um MP3 de baixa qualidade pra FLAC não adiciona nenhuma "
+            "informação nova -- só reempacota o mesmo som (incluindo os cortes "
+            "e perdas que já existiam) num formato que parece Hi-Res. Isso é "
+            "feito às vezes pra vender ou distribuir arquivos como se fossem de "
+            "qualidade maior do que realmente são.",
+        ),
+        (
+            "Como esse teste funciona, exatamente?",
+            "O inspetor decodifica pedaços do áudio, roda uma FFT (Transformada "
+            "Rápida de Fourier) em cada um, e mede a energia média em cada "
+            "frequência. Depois procura o ponto onde essa energia cai "
+            "abruptamente pro nível de ruído de fundo -- esse é o \u201ccorte\u201d. "
+            "É uma HEURÍSTICA, não uma prova matemática: masterizações antigas "
+            "ou gravações com corte natural podem dar falso positivo, e um "
+            "upsample de bitrate muito alto pode passar despercebido.",
+        ),
+    )
 
     # -- Elementos SVG: grade, hachura, curva, linhas de referência -------
     partes_svg = []
@@ -897,7 +940,7 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
   body {{
     margin: 0; padding: 24px 16px 40px;
     background: var(--cor-fundo); color: var(--cor-texto);
-    font-family: "SF Mono", "DejaVu Sans Mono", "Consolas", ui-monospace, monospace;
+    font-family: "Menlo", "SF Mono", "Consolas", "DejaVu Sans Mono", ui-monospace, monospace;
   }}
   .container {{ max-width: 1200px; margin: 0 auto; }}
   h1 {{
@@ -921,6 +964,24 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
   .painel p:first-child {{ color: var(--cor-texto); margin: 0; }}
   .painel p {{ color: var(--cor-secundario); margin: 0; }}
   .rodape {{ display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }}
+  .saiba-mais {{ margin: 20px 0; }}
+  .saiba-mais summary {{
+    cursor: pointer; font-size: 0.9rem; font-weight: bold; color: var(--cor-texto);
+    padding: 4px 0;
+  }}
+  .saiba-mais summary:hover {{ color: var(--cor-destaque); }}
+  details {{
+    border: 1px solid var(--cor-grade); border-radius: 4px; padding: 10px 16px;
+    margin-bottom: 8px; background: var(--cor-painel-fundo);
+  }}
+  details > summary {{ list-style: none; }}
+  details > summary::-webkit-details-marker {{ display: none; }}
+  details > summary::before {{ content: "+ "; color: var(--cor-destaque); }}
+  details[open] > summary::before {{ content: "- "; }}
+  details p {{
+    color: var(--cor-secundario); font-size: 0.85rem; line-height: 1.6;
+    margin: 10px 0 0;
+  }}
   .badge {{
     display: inline-block; padding: 8px 18px; font-weight: bold; font-size: 1rem;
     border-radius: 3px; border: 1px solid var(--cor-secundario);
@@ -953,6 +1014,12 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
   </svg>
   <div class="painel">
     {"".join(f"<p>{_esc(linha)}</p>" for linha in explicacao)}
+  </div>
+  <div class="saiba-mais">
+    {"".join(
+        f"<details><summary>{_esc(titulo)}</summary><p>{_esc(corpo)}</p></details>"
+        for titulo, corpo in saiba_mais
+    )}
   </div>
   <div class="rodape">
     <span class="badge badge-{veredito}">{veredito_txt}</span>

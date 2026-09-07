@@ -124,7 +124,7 @@ def _make_sort_name(name) -> str:
     )
     for art in articles:
         if name.startswith(art):
-            return name[len(art) :].strip() + ", " + art.strip()
+            return name[len(art):].strip() + ", " + art.strip()
     return name
 
 
@@ -404,8 +404,8 @@ def tag_flac(
     for k, v in tags.items():
         if v:
             if (
-                getattr(settings, "multi_value_tags", False)
-                and k
+                getattr(settings, "multi_value_tags", False) and
+                k
                 in [
                     "ARTIST",
                     "ARTISTSORT",
@@ -413,8 +413,8 @@ def tag_flac(
                     "ALBUMARTISTSORT",
                     "COMPOSER",
                     "GENRE",
-                ]
-                and isinstance(v, str)
+                ] and
+                isinstance(v, str)
             ):
                 if ", " in v:
                     v = v.replace(", ", " ; ")
@@ -524,8 +524,8 @@ def tag_mp3(
     for k, v in tags.items():
         if v:
             if (
-                getattr(settings, "multi_value_tags", False)
-                and k
+                getattr(settings, "multi_value_tags", False) and
+                k
                 in [
                     "ARTIST",
                     "ARTISTSORT",
@@ -533,8 +533,8 @@ def tag_mp3(
                     "ALBUMARTISTSORT",
                     "COMPOSER",
                     "GENRE",
-                ]
-                and isinstance(v, str)
+                ] and
+                isinstance(v, str)
             ):
                 if ", " in v:
                     v = v.replace(", ", " ; ")
@@ -629,9 +629,9 @@ def _get_tags_to_add(
                     roles = parts[1:]
 
                     if (
-                        "FeaturedArtist" in roles
-                        or "MainArtist" in roles
-                        or "PrimaryArtist" in roles
+                        "FeaturedArtist" in roles or
+                        "MainArtist" in roles or
+                        "PrimaryArtist" in roles
                     ):
                         add_unique_artist(name)
 

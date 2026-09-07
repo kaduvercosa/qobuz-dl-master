@@ -107,17 +107,17 @@ async def sync_database(directory, db_path, client):
 
                     # # Mesma hierarquia de busca do FLAC, adaptada aos frames TXXX do MP3.
                     track_txxx = (
-                        audio.get("TXXX:QDL_TRACK_ID")
-                        or audio.get("TXXX:qdl_track_id")
-                        or audio.get("TXXX:QOBUZTRACKID")
+                        audio.get("TXXX:QDL_TRACK_ID") or
+                        audio.get("TXXX:qdl_track_id") or
+                        audio.get("TXXX:QOBUZTRACKID")
                     )
                     if track_txxx:
                         track_id = track_txxx.text[0]
 
                     album_txxx = (
-                        audio.get("TXXX:QDL_ALBUM_ID")
-                        or audio.get("TXXX:qdl_album_id")
-                        or audio.get("TXXX:QOBUZALBUMID")
+                        audio.get("TXXX:QDL_ALBUM_ID") or
+                        audio.get("TXXX:qdl_album_id") or
+                        audio.get("TXXX:QOBUZALBUMID")
                     )
                     if album_txxx:
                         album_id = album_txxx.text[0]

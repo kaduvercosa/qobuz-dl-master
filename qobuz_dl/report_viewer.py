@@ -241,8 +241,8 @@ def renderizar_html(report: dict) -> str:
     mostrar_artista_col = len(artistas_distintos) > 1
 
     faixas_html = (
-        "".join(_renderizar_faixa(f, mostrar_artista_col) for f in faixas)
-        or '<div class="empty">Nenhuma faixa registrada ainda.</div>'
+        "".join(_renderizar_faixa(f, mostrar_artista_col) for f in faixas) or
+        '<div class="empty">Nenhuma faixa registrada ainda.</div>'
     )
 
     resumo_stats = "".join(

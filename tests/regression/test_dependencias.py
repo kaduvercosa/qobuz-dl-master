@@ -26,7 +26,25 @@ try:
 except ModuleNotFoundError:  # pragma: no cover
     import tomli as tomllib  # type: ignore
 
-RAIZ = Path(__file__).resolve().parent.parent
+
+def _achar_raiz(inicio: Path) -> Path:
+    """Sobe os diretórios até achar o pyproject.toml da raiz do projeto.
+
+    Substitui o `parent.parent` fixo, que quebrava sempre que os testes
+    eram reorganizados em subpastas (ex: tests/regression/) porque a
+    profundidade até a raiz do projeto deixava de ser constante.
+    """
+    atual = inicio
+    for _ in range(6):  # limite de segurança contra loop infinito
+        if (atual / "pyproject.toml").is_file():
+            return atual
+        atual = atual.parent
+    raise RuntimeError(
+        f"Não achei pyproject.toml subindo a partir de {inicio}"
+    )
+
+
+RAIZ = _achar_raiz(Path(__file__).resolve().parent)
 PYPROJECT = RAIZ / "pyproject.toml"
 PACOTE = RAIZ / "qobuz_dl"
 

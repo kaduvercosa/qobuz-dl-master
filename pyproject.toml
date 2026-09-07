@@ -121,6 +121,14 @@ markers = [
     "slow: abre subprocesso ou espera I/O real; pule com -m 'not slow' no dia a dia",
     "integration: toca o sistema de arquivos real ou a API; requer credenciais",
     "asyncio: marca corotinas de teste (gerenciado automaticamente pelo pytest-asyncio)",
+    # Marcadores de categoria, um por subpasta de tests/ -- permitem
+    # `pytest -m ui` / `pytest -m network` etc. além de já separar
+    # visualmente na coleta (tests/unit/..., tests/network/...).
+    "unit: logica pura, sem rede/subprocess/arquivo -- deve rodar em milissegundos",
+    "network: exercita a camada HTTP via pytest-httpx (mockado, nunca toca rede real)",
+    "ui: saida de terminal -- quebra de linha, largura, concorrencia entre logging e tqdm",
+    "regression: trava um bug historico especifico (ver a docstring do arquivo)",
+    "lyrics: busca/processamento/formatacao de letras (Qobuz e Genius)",
 ]
 
 asyncio_mode = "auto"
