@@ -63,8 +63,6 @@ def test_nenhuma_linha_estoura(
     capsys,
 ):
     """Nenhuma linha deve ultrapassar a largura configurada."""
-    if "palavra-unica" in mensagem:
-        pytest.skip("palavra unica maior que a largura não pode ser quebrada")
 
     linhas = _capturar(
         funcao,
