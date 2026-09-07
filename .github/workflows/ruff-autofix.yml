@@ -1,22 +1,28 @@
 name: Ruff Auto-Fix
 
 on:
-  workflow_dispatch: # Permite rodar manualmente no botão do GitHub
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   autofix:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
+
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
 
       - name: Install Ruff
         run: pip install ruff
 
       - name: Run Ruff Fix
         run: |
-          ruff check --fix --unsafe-fixes .
+          ruff check . --fix
           ruff format .
 
       - name: Commit fixes
