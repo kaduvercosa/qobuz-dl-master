@@ -101,9 +101,9 @@ def _detectar_pasta_padrao():
     # do Android (onde o usuário de fato vê "Música" no gerenciador de
     # arquivos) fica montado à parte, não dentro do HOME do Termux.
     if (
-        "com.termux" in home_dir or
-        os.environ.get("ANDROID_ROOT") or
-        os.environ.get("ANDROID_DATA")
+        "com.termux" in home_dir
+        or os.environ.get("ANDROID_ROOT")
+        or os.environ.get("ANDROID_DATA")
     ):
         candidatos.append("/storage/emulated/0/Music")
         candidatos.append("/sdcard/Music")
@@ -157,9 +157,9 @@ def _listar_diretorio(caminho):
         (
             e
             for e in brutos
-            if e.is_file(follow_symlinks=False) and
-            not e.name.startswith(".") and
-            e.name.lower().endswith(_AUDIO_EXTS)
+            if e.is_file(follow_symlinks=False)
+            and not e.name.startswith(".")
+            and e.name.lower().endswith(_AUDIO_EXTS)
         ),
         key=lambda e: e.name.lower(),
     )
@@ -682,8 +682,8 @@ def _suavizar(valores, janela=11):
         return list(valores)
     metade = janela // 2
     return [
-        sum(valores[max(0, i - metade): min(n, i + metade + 1)]) /
-        len(valores[max(0, i - metade): min(n, i + metade + 1)])
+        sum(valores[max(0, i - metade) : min(n, i + metade + 1)])
+        / len(valores[max(0, i - metade) : min(n, i + metade + 1)])
         for i in range(n)
     ]
 
@@ -1016,14 +1016,17 @@ def _gerar_grafico_html(caminho_audio, genuinidade):
     {"".join(f"<p>{_esc(linha)}</p>" for linha in explicacao)}
   </div>
   <div class="saiba-mais">
-    {"".join(
-        f"<details><summary>{_esc(titulo)}</summary><p>{_esc(corpo)}</p></details>"
-        for titulo, corpo in saiba_mais
-    )}
+    {
+        "".join(
+            f"<details><summary>{_esc(titulo)}</summary><p>{_esc(corpo)}</p></details>"
+            for titulo, corpo in saiba_mais
+        )
+    }
   </div>
   <div class="rodape">
     <span class="badge badge-{veredito}">{veredito_txt}</span>
-    <span class="proporcao">{genuinidade["proporcao"] * 100:.0f}% da banda com som de verdade</span>
+    <span class="proporcao">{
+        genuinidade["proporcao"] * 100:.0f}% da banda com som de verdade</span>
   </div>
   <p class="marca">QOBUZ-DL INSPECTOR</p>
 </div>

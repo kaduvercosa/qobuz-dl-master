@@ -51,9 +51,9 @@ def _scan_local_tracks(directory):
                 else:
                     audio = ID3(fpath)
                     track_txxx = (
-                        audio.get("TXXX:QDL_TRACK_ID") or
-                        audio.get("TXXX:qdl_track_id") or
-                        audio.get("TXXX:QOBUZTRACKID")
+                        audio.get("TXXX:QDL_TRACK_ID")
+                        or audio.get("TXXX:qdl_track_id")
+                        or audio.get("TXXX:QOBUZTRACKID")
                     )
                     if track_txxx:
                         track_id = track_txxx.text[0]

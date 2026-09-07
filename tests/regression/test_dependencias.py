@@ -39,9 +39,7 @@ def _achar_raiz(inicio: Path) -> Path:
         if (atual / "pyproject.toml").is_file():
             return atual
         atual = atual.parent
-    raise RuntimeError(
-        f"Não achei pyproject.toml subindo a partir de {inicio}"
-    )
+    raise RuntimeError(f"Não achei pyproject.toml subindo a partir de {inicio}")
 
 
 RAIZ = _achar_raiz(Path(__file__).resolve().parent)

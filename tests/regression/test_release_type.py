@@ -37,12 +37,14 @@ class TestPalavrasChaveTemPrioridadeSobreContagem:
         assert classify_release_type(title="Unplugged (Live)", track_count=1) == "live"
 
     def test_live_na_versao(self):
-        assert classify_release_type(
-            version="Live at Wembley", track_count=12) == "live"
+        assert (
+            classify_release_type(version="Live at Wembley", track_count=12) == "live"
+        )
 
     def test_compilation_por_titulo(self):
-        assert classify_release_type(
-            title="Greatest Hits", track_count=2) == "compilation"
+        assert (
+            classify_release_type(title="Greatest Hits", track_count=2) == "compilation"
+        )
 
     def test_ep_por_titulo_com_espaco_antes(self):
         assert classify_release_type(title="Some Songs EP", track_count=12) == "ep"
@@ -63,15 +65,17 @@ class TestContagemDeFaixasCorrigeATagDaApi:
     disser outra coisa dentro do proprio trio single/ep/album."""
 
     def test_ate_3_e_single(self):
-        assert classify_release_type(
-            track_count=3, api_release_type="album") == "single"
+        assert (
+            classify_release_type(track_count=3, api_release_type="album") == "single"
+        )
 
     def test_de_4_a_7_e_ep(self):
         assert classify_release_type(track_count=5, api_release_type="single") == "ep"
 
     def test_acima_de_7_e_album(self):
-        assert classify_release_type(
-            track_count=8, api_release_type="single") == "album"
+        assert (
+            classify_release_type(track_count=8, api_release_type="single") == "album"
+        )
 
     def test_contagem_vence_tag_errada_da_api(self):
         """O caso descrito na docstring de classify_release_type: gravadora
@@ -111,8 +115,10 @@ class TestFormatReleaseType:
         assert format_release_type(None, track_count=2) == "Single"
 
     def test_desconhecido_vira_texto_amigavel(self):
-        assert format_release_type(
-            None, track_count=0, duration_seconds=0) == "Desconhecido"
+        assert (
+            format_release_type(None, track_count=0, duration_seconds=0)
+            == "Desconhecido"
+        )
 
 
 class TestMediaTypeNuncaDivergeDeReleaseType:

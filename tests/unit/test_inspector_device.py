@@ -36,8 +36,9 @@ def _apenas_estas_pastas_existem(monkeypatch, *pastas_existentes):
     passadas aqui -- ver docstring do módulo sobre por que isso é melhor
     que criar diretórios reais."""
     normalizadas = set(pastas_existentes)
-    monkeypatch.setattr(inspector.os.path, "isdir",
-                        lambda caminho: caminho in normalizadas)
+    monkeypatch.setattr(
+        inspector.os.path, "isdir", lambda caminho: caminho in normalizadas
+    )
 
 
 class TestOverrideManual:
@@ -70,7 +71,9 @@ class TestDeteccaoPorDispositivo:
 
         assert inspector._detectar_pasta_padrao() == f"{home}/Documents"
 
-    def test_ios_sem_documents_nao_trava_e_cai_pro_home(self, ambiente_limpo, monkeypatch):
+    def test_ios_sem_documents_nao_trava_e_cai_pro_home(
+        self, ambiente_limpo, monkeypatch
+    ):
         home = "/private/var/mobile/Containers/Data/Application/ABC-123"
         monkeypatch.setenv("HOME", home)
         _apenas_estas_pastas_existem(monkeypatch, home)  # só o HOME em si existe
