@@ -164,9 +164,9 @@ def test_primeira_linha_tem_tag(funcao, monkeypatch, capsys):
     )
 
     assert linhas, "nenhuma linha foi emitida"
-    assert re.match(
-        r"^\[[+!*~-]\] ", linhas[0]
-    ), f"primeira linha não começa com tag: {linhas[0]!r}"
+    assert re.match(r"^\[[+!*~-]\] ", linhas[0]), (
+        f"primeira linha não começa com tag: {linhas[0]!r}"
+    )
 
 
 def test_mensagem_vazia_nao_estoura(monkeypatch, capsys):

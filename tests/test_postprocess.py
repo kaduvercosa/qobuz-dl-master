@@ -117,7 +117,6 @@ class TestNormId:
 
 
 class TestInitReport:
-
     def test_cria_arquivo_em_pasta_nova(self, pp, tmp_path):
         asyncio.run(pp.init_report(str(tmp_path), tipo="faixa", titulo="Single X"))
         assert (tmp_path / ".report.json").exists()
@@ -284,7 +283,6 @@ class TestInitReport:
 
 
 class TestUpdateTrackStatus:
-
     def test_cria_report_quando_nao_existe(self, pp, tmp_path):
         asyncio.run(
             pp.update_track_status(
@@ -362,9 +360,9 @@ class TestUpdateTrackStatus:
             )
         )
         r = _ler(str(tmp_path))
-        assert (
-            len(r["faixas"]) == 1
-        ), f"Bug de duplicata: {len(r['faixas'])} entradas para o mesmo ID"
+        assert len(r["faixas"]) == 1, (
+            f"Bug de duplicata: {len(r['faixas'])} entradas para o mesmo ID"
+        )
 
     def test_id_str_depois_de_int_via_init(self, pp, tmp_path):
         """Variante: init_report usa int (API JSON), update usa str (URL)."""
@@ -390,9 +388,9 @@ class TestUpdateTrackStatus:
             )
         )
         r = _ler(str(tmp_path))
-        assert (
-            len(r["faixas"]) == 2
-        ), f"Bug de duplicata: {len(r['faixas'])} faixas (esperado 2)"
+        assert len(r["faixas"]) == 2, (
+            f"Bug de duplicata: {len(r['faixas'])} faixas (esperado 2)"
+        )
         assert _status(r)["257946874"] == "ok"
 
     def test_lista_sempre_ordenada_por_numero(self, pp, tmp_path):
@@ -481,7 +479,6 @@ class TestUpdateTrackStatus:
 
 
 class TestFinalizeReport:
-
     def test_estado_completo(self, pp, tmp_path):
         asyncio.run(
             pp.update_track_status(

@@ -101,9 +101,9 @@ def _detectar_pasta_padrao():
     # do Android (onde o usuário de fato vê "Música" no gerenciador de
     # arquivos) fica montado à parte, não dentro do HOME do Termux.
     if (
-        "com.termux" in home_dir or
-        os.environ.get("ANDROID_ROOT") or
-        os.environ.get("ANDROID_DATA")
+        "com.termux" in home_dir
+        or os.environ.get("ANDROID_ROOT")
+        or os.environ.get("ANDROID_DATA")
     ):
         candidatos.append("/storage/emulated/0/Music")
         candidatos.append("/sdcard/Music")
@@ -157,9 +157,9 @@ def _listar_diretorio(caminho):
         (
             e
             for e in brutos
-            if e.is_file(follow_symlinks=False) and
-            not e.name.startswith(".") and
-            e.name.lower().endswith(_AUDIO_EXTS)
+            if e.is_file(follow_symlinks=False)
+            and not e.name.startswith(".")
+            and e.name.lower().endswith(_AUDIO_EXTS)
         ),
         key=lambda e: e.name.lower(),
     )
@@ -682,8 +682,8 @@ def _suavizar(valores, janela=11):
         return list(valores)
     metade = janela // 2
     return [
-        sum(valores[max(0, i - metade): min(n, i + metade + 1)]) /
-        len(valores[max(0, i - metade): min(n, i + metade + 1)])
+        sum(valores[max(0, i - metade) : min(n, i + metade + 1)])
+        / len(valores[max(0, i - metade) : min(n, i + metade + 1)])
         for i in range(n)
     ]
 

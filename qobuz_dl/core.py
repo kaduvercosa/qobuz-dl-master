@@ -1417,10 +1417,10 @@ class QobuzDL:
             is_track_batch = type_dict["iterable_key"] == "tracks"
             batch_workers = int(getattr(self.settings, "max_workers", 1))
             can_parallelize = (
-                is_track_batch and
-                batch_workers > 1 and
-                len(items) > 1 and
-                getattr(self, "delay", 0) <= 0
+                is_track_batch
+                and batch_workers > 1
+                and len(items) > 1
+                and getattr(self, "delay", 0) <= 0
             )
             position_pool = (
                 downloader._PositionPool(batch_workers) if can_parallelize else None
@@ -1461,8 +1461,8 @@ class QobuzDL:
 
             for idx, item in enumerate(items, start=1):
                 if (
-                    getattr(self, "allowed_release_types", None) and
-                    url_type == "artist"
+                    getattr(self, "allowed_release_types", None)
+                    and url_type == "artist"
                 ):
                     try:
                         r_type = "unknown"
@@ -1475,9 +1475,9 @@ class QobuzDL:
 
                         if full_meta:
                             r_type = (
-                                full_meta.get("release_type") or
-                                full_meta.get("product_type") or
-                                "unknown"
+                                full_meta.get("release_type")
+                                or full_meta.get("product_type")
+                                or "unknown"
                             ).lower()
 
                         # Classificação unificada (ver _classify_release_type
@@ -1802,9 +1802,9 @@ class QobuzDL:
 
         if mode_dict.get("requires_extra") or item_type in ["album", "track"]:
             artist = (
-                i.get("artist", {}).get("name") or
-                i.get("performer", {}).get("name") or
-                "Unknown"
+                i.get("artist", {}).get("name")
+                or i.get("performer", {}).get("name")
+                or "Unknown"
             )
             title = i.get("title") or i.get("name") or "Unknown"
             if i.get("version"):
@@ -1834,9 +1834,9 @@ class QobuzDL:
 
             if raw_type == "unknown" and isinstance(i.get("album"), dict):
                 raw_type = (
-                    i["album"].get("release_type") or
-                    i["album"].get("product_type") or
-                    "unknown"
+                    i["album"].get("release_type")
+                    or i["album"].get("product_type")
+                    or "unknown"
                 ).lower()
 
             # Classificação unificada (ver _classify_release_type no topo
@@ -1967,9 +1967,9 @@ class QobuzDL:
                     iterable = []
                     user_id = getattr(self.client, "user_id", None)
                     if (
-                        not user_id and
-                        hasattr(self.client, "user") and
-                        isinstance(self.client.user, dict)
+                        not user_id
+                        and hasattr(self.client, "user")
+                        and isinstance(self.client.user, dict)
                     ):
                         user_id = self.client.user.get("id")
 

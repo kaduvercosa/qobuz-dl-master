@@ -83,7 +83,6 @@ TRADUCAO_SIMPLES = (
 
 
 class TestMsToLrcTimestamp:
-
     def test_formato_correto(self, ms_to_tag):
         assert ms_to_tag(0) == "[00:00.000]"
 
@@ -102,7 +101,6 @@ class TestMsToLrcTimestamp:
 
 
 class TestBuildBilingualLrc:
-
     def test_retorna_original_sem_traducao(self, build_bilingual):
         r = build_bilingual(ORIGINAL_SIMPLES, None)
         assert r == ORIGINAL_SIMPLES
@@ -161,9 +159,9 @@ class TestBuildBilingualLrc:
         ]
         # Cada timestamp deve ser >= ao anterior
         for i in range(1, len(timestamps_ms)):
-            assert (
-                timestamps_ms[i] >= timestamps_ms[i - 1]
-            ), f"ordem violada: {timestamps_ms[i - 1]} > {timestamps_ms[i]}"
+            assert timestamps_ms[i] >= timestamps_ms[i - 1], (
+                f"ordem violada: {timestamps_ms[i - 1]} > {timestamps_ms[i]}"
+            )
 
     def test_traducao_sem_par_nao_quebra(self, build_bilingual):
         """Timestamp na traducao sem correspondente no original."""

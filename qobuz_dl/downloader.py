@@ -487,8 +487,8 @@ class Download:
             raise NonStreamable("Este lançamento nao está disponível para streaming")
 
         if self.albums_only and (
-            album_meta.get("release_type") != "album" or
-            album_meta.get("artist").get("name") == "Various Artists"
+            album_meta.get("release_type") != "album"
+            or album_meta.get("artist").get("name") == "Various Artists"
         ):
             ui.skip(f"Ignorando Single/EP/VA: {album_meta.get('title', 'n/a')}")
             return
@@ -958,9 +958,9 @@ class Download:
             track_attr = None
         else:
             if (
-                getattr(self, "is_playlist", False) and
-                not getattr(self, "playlist_as_albums", False) and
-                getattr(self, "playlist_track_number", None)
+                getattr(self, "is_playlist", False)
+                and not getattr(self, "playlist_as_albums", False)
+                and getattr(self, "playlist_track_number", None)
             ):
                 track_meta["track_number"] = self.playlist_track_number
 
@@ -1088,8 +1088,8 @@ class Download:
                             saved_name="cover.jpg",
                             embed_name=(
                                 embed_cover_path and os.path.basename(embed_cover_path)
-                            ) or
-                            "",
+                            )
+                            or "",
                             saved_art_size=self.settings.saved_art_size,
                             embedded_art_size=self.settings.embedded_art_size,
                             session=self.http_session,
@@ -1140,8 +1140,8 @@ class Download:
                 # nao importa a ordem de conclusao entre elas.
                 numero_report = (
                     self.playlist_track_number
-                    if getattr(self, "is_playlist", False) and
-                    getattr(self, "playlist_track_number", None)
+                    if getattr(self, "is_playlist", False)
+                    and getattr(self, "playlist_track_number", None)
                     else track_meta.get("track_number", 1)
                 )
                 tipo_report = (
@@ -1199,8 +1199,8 @@ class Download:
             )
 
         is_batch_or_playlist = (
-            getattr(self, "is_playlist", False) or
-            getattr(self.settings, "pl_success", None) is not None
+            getattr(self, "is_playlist", False)
+            or getattr(self.settings, "pl_success", None) is not None
         )
 
         if not is_batch_or_playlist:
@@ -1503,9 +1503,9 @@ class Download:
             ui.error(f"Erro ao aplicar tags: {e}")
 
         if (
-            getattr(self, "fetch_lyrics", False) and
-            hasattr(self, "lyrics_engine") and
-            not abort_event.is_set()
+            getattr(self, "fetch_lyrics", False)
+            and hasattr(self, "lyrics_engine")
+            and not abort_event.is_set()
         ):
             album_artist = _safe_get(track_metadata, "album", "artist", "name")
             performer_name = _safe_get(
@@ -1533,9 +1533,9 @@ class Download:
 
             translation_note = None
             if (
-                translation_lang and
-                not qobuz_translation_response and
-                isinstance(qobuz_lyrics_response, dict)
+                translation_lang
+                and not qobuz_translation_response
+                and isinstance(qobuz_lyrics_response, dict)
             ):
                 original_block = qobuz_lyrics_response.get("original")
                 original_lang = (
@@ -1592,8 +1592,8 @@ class Download:
         )
 
         if (
-            getattr(self.settings, "verify_after_download", False) and
-            not abort_event.is_set()
+            getattr(self.settings, "verify_after_download", False)
+            and not abort_event.is_set()
         ):
 
             def _run_verify():
@@ -2208,9 +2208,9 @@ async def tqdm_download(
                             )
 
                         if (
-                            is_parallel and
-                            downloaded_size == 0 and
-                            attempt.retry_state.attempt_number == 1
+                            is_parallel
+                            and downloaded_size == 0
+                            and attempt.retry_state.attempt_number == 1
                         ):
                             size_mb = total_size / (1024 * 1024) if total_size else 0
                             ui.step(f"Em Progresso: {track_name} [{size_mb:.1f} MB]")
@@ -2806,11 +2806,11 @@ async def tqdm_download_segments(
 def _get_qobuz_segment_uuid(segment_data):
     pos = 0
     while pos + 24 <= len(segment_data):
-        size = int.from_bytes(segment_data[pos: pos + 4], "big")
+        size = int.from_bytes(segment_data[pos : pos + 4], "big")
         if size <= 0 or pos + size > len(segment_data):
             break
-        if bytes(segment_data[pos + 4: pos + 8]) == b"uuid":
-            return bytes(segment_data[pos + 8: pos + 24])
+        if bytes(segment_data[pos + 4 : pos + 8]) == b"uuid":
+            return bytes(segment_data[pos + 8 : pos + 24])
         pos += size
     return None
 
@@ -2822,39 +2822,39 @@ def _decrypt_qobuz_segment(segment_data, raw_key, segment_uuid):
     buf = bytearray(segment_data)
     pos = 0
     while pos + 8 <= len(buf):
-        size = int.from_bytes(buf[pos: pos + 4], "big")
+        size = int.from_bytes(buf[pos : pos + 4], "big")
         if size <= 0 or pos + size > len(buf):
             break
 
         if (
-            bytes(buf[pos + 4: pos + 8]) == b"uuid" and
-            bytes(buf[pos + 8: pos + 24]) == segment_uuid
+            bytes(buf[pos + 4 : pos + 8]) == b"uuid"
+            and bytes(buf[pos + 8 : pos + 24]) == segment_uuid
         ):
             pointer = pos + 28
-            data_end = pos + int.from_bytes(buf[pointer: pointer + 4], "big")
+            data_end = pos + int.from_bytes(buf[pointer : pointer + 4], "big")
             pointer += 4
             counter_len = buf[pointer]
             pointer += 1
-            frame_count = int.from_bytes(buf[pointer: pointer + 3], "big")
+            frame_count = int.from_bytes(buf[pointer : pointer + 3], "big")
             pointer += 3
 
             for _ in range(frame_count):
-                frame_len = int.from_bytes(buf[pointer: pointer + 4], "big")
+                frame_len = int.from_bytes(buf[pointer : pointer + 4], "big")
                 pointer += 6
-                flags = int.from_bytes(buf[pointer: pointer + 2], "big")
+                flags = int.from_bytes(buf[pointer : pointer + 2], "big")
                 pointer += 2
                 frame_start, data_end = data_end, data_end + frame_len
 
                 if flags:
-                    counter = bytes(buf[pointer: pointer + counter_len]) + (
+                    counter = bytes(buf[pointer : pointer + counter_len]) + (
                         b"\x00" * (16 - counter_len)
                     )
                     decryptor = Cipher(
                         algorithms.AES(raw_key), modes.CTR(counter)
                     ).decryptor()
                     plaintext = (
-                        decryptor.update(bytes(buf[frame_start:data_end])) +
-                        decryptor.finalize()
+                        decryptor.update(bytes(buf[frame_start:data_end]))
+                        + decryptor.finalize()
                     )
                     buf[frame_start:data_end] = plaintext
                 pointer += counter_len

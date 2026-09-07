@@ -501,8 +501,8 @@ class Client:
                         "favorite/getUserFavorites",
                         "file/url",
                         "track/lyricsUrl",
-                    ] and
-                    resp.status_code == 400
+                    ]
+                    and resp.status_code == 400
                 ):
                     body = resp.json()
                     raise InvalidAppSecretError(
@@ -570,9 +570,9 @@ class Client:
                 highest_ratio = 0.0
 
                 if (
-                    search_results and
-                    "tracks" in search_results and
-                    search_results["tracks"]["items"]
+                    search_results
+                    and "tracks" in search_results
+                    and search_results["tracks"]["items"]
                 ):
                     for q_track in search_results["tracks"]["items"]:
                         q_artist_raw = q_track.get("performer", {}).get(
@@ -693,8 +693,8 @@ class Client:
 
         if isrc_hits or isrc_misses:
             logger.info(
-                f"{GREEN}[+] ISRC: {isrc_hits} match(es) exato(s){OFF}" +
-                (
+                f"{GREEN}[+] ISRC: {isrc_hits} match(es) exato(s){OFF}"
+                + (
                     f", {YELLOW}{isrc_misses} miss(es) → fuzzy fallback{OFF}"
                     if isrc_misses
                     else ""
@@ -752,7 +752,7 @@ class Client:
         BATCH = 50
         success = True
         for i in range(0, len(track_ids), BATCH):
-            batch = track_ids[i: i + BATCH]
+            batch = track_ids[i : i + BATCH]
             try:
                 await self.api_call(
                     "playlist/addTracks",
@@ -819,9 +819,11 @@ class Client:
         """
         sub_info = self.check_subscription()
         if not sub_info["is_active"]:
-            raise NoActiveSubscriptionError(f"Assinatura inativa ou expirada ({
-                sub_info['status']
-            }). Download bloqueado.")
+            raise NoActiveSubscriptionError(
+                f"Assinatura inativa ou expirada ({
+                    sub_info['status']
+                }). Download bloqueado."
+            )
 
         if int(fmt_id) == 5:
             return await self.api_call("track/getFileUrl", id=id, fmt_id=fmt_id)
