@@ -20,7 +20,13 @@ from qobuz_dl.utils import classify_release_type, get_album_artist
 logger = logging.getLogger(__name__)
 
 
-COPYRIGHT, PHON_COPYRIGHT = "\u2117", "\u00a9"
+COPYRIGHT, PHON_COPYRIGHT = "\u00a9", "\u2117"
+# ANTES: os dois valores estavam trocados ("\u2117", "\u00a9") -- COPYRIGHT
+# (usado pro marcador "(C)") recebia o símbolo de copyright FONOGRÁFICO
+# (℗), e PHON_COPYRIGHT (usado pro marcador "(P)") recebia o símbolo de
+# copyright comum (©). O oposto do que os nomes das variáveis dizem, e do
+# padrão real: (C) = © (obra), (P) = ℗ (gravação sonora). Achado
+# escrevendo teste pra _format_copyright().
 # # Limite máximo de um bloco de metadados FLAC: 0xFFFFFF bytes.
 FLAC_MAX_BLOCKSIZE = 16777215
 

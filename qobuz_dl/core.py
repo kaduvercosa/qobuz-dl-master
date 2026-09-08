@@ -93,10 +93,23 @@ def _shade(f):
     # com preto) a cor de destaque, usado pra diferenciar os "tipos"
     # de lançamento (álbum/EP/single/etc.) na TUI sem cadastrar uma
     # cor fixa pra cada tipo.
+    #
+    # Os únicos usos hoje ficam em [-0.3, 0.3] (ver constantes logo
+    # abaixo), então esse clamp nunca dispara na prática -- mas sem ele,
+    # um fator fora de [-1, 1] (ex.: 2.0) produz canal > 255, e
+    # `f"{415:02x}"` vira "19f" (3 dígitos) em vez de 2, gerando uma
+    # string de cor hex malformada tipo "#19f...". Clampar deixa a
+    # função segura pra qualquer fator, não só os que o código chama hoje.
     if f > 0:
-        return f"#{int(_r + (255 - _r) * f):02x}{int(_g + (255 - _g) * f):02x}{int(_b + (255 - _b) * f):02x}"
+        r = _r + (255 - _r) * f
+        g = _g + (255 - _g) * f
+        b = _b + (255 - _b) * f
     else:
-        return f"#{int(_r * (1 + f)):02x}{int(_g * (1 + f)):02x}{int(_b * (1 + f)):02x}"
+        r = _r * (1 + f)
+        g = _g * (1 + f)
+        b = _b * (1 + f)
+    r, g, b = (max(0, min(255, int(c))) for c in (r, g, b))
+    return f"#{r:02x}{g:02x}{b:02x}"
 
 
 _hex_item_title = _hex_accent

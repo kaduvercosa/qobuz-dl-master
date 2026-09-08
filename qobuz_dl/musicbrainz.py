@@ -132,14 +132,31 @@ async def lookup_by_isrc(
             finally:
                 if own_session:
                     await client.aclose()
-
-            # Throttle: 1 req/s conforme guidelines do MusicBrainz
-            await asyncio.sleep(1.0)
+                # Throttle: 1 req/s conforme guidelines do MusicBrainz.
+                # ANTES este sleep ficava DEPOIS do bloco try/finally --
+                # como todo caminho normal do try acima termina em
+                # `return`, aquele sleep era código morto: nunca
+                # executava, e o throttle real dependia só do semaphore
+                # de 1 slot (que serializa requisições, mas não impõe
+                # nenhum intervalo mínimo entre elas). Movido pra dentro
+                # do `finally` pra rodar sempre que uma requisição foi de
+                # fato tentada, ainda segurando o semaphore -- é isso que
+                # garante o intervalo de verdade antes da próxima task
+                # conseguir o slot.
+                await asyncio.sleep(1.0)
 
         except httpx.HTTPStatusError as e:
             logger.debug(f"MusicBrainz HTTP error para {isrc}: {e}")
         except Exception as e:
             logger.debug(f"MusicBrainz lookup falhou para {isrc}: {e}")
 
-    _MB_CACHE[isrc] = (None, None, None)
+    # ANTES: esta linha cacheava (None, None, None) tanto pra "MusicBrainz
+    # respondeu e não achou nada" quanto pra "a requisição falhou"
+    # (timeout, 500, erro de rede) -- os dois caindo aqui pelos `except`
+    # acima. Resultado: um erro TRANSITÓRIO virava um "sem match"
+    # PERMANENTE pro resto da sessão, e nenhuma faixa seguinte com o
+    # mesmo ISRC tentava de novo. Motivo de espalhar em vez de reunir: o
+    # cache positivo de "não encontrado" já é gravado explicitamente lá
+    # em cima (`if not recordings: _MB_CACHE[isrc] = (None, None, None)`)
+    # -- só o caminho de exceção não deve cachear.
     return None, None, None
