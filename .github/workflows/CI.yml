@@ -1,16 +1,22 @@
 name: CI
 
-# "lint": roda o flake8 (usa o .flake8 do repo) sobre qobuz_dl/.
+# Antes este arquivo se chamava lint.yml e tinha DOIS jobs: um rodando
+# Flake8 e outro rodando a suite de testes. O job de lint foi removido
+# daqui porque o Ruff (ver ruff.yml) cobre as mesmas regras (E, F, W, B,
+# C, T) e já roda em paralelo -- ter os dois linters no mesmo CI custava
+# o dobro do tempo pra checar a mesma coisa duas vezes, com risco real de
+# um aprovar e o outro reprovar por regra configurada de forma diferente
+# entre .flake8 e [tool.ruff] no pyproject.toml.
 #
-# "tests": roda a suíte de testes automatizada (tests/test_*.py). Os
+# O job de testes continua igual: roda a suíte (tests/test_*.py). Os
 # testes marcados "slow" (abrem subprocesso real do programa) ficam de
 # fora por padrão pra manter o CI rápido -- rode-os manualmente com
 # `pytest -m slow` quando precisar.
 #
-# tests/manual/ (ex.: verificar_letras.py) fica DE FORA de propósito:
-# exige login real no Qobuz e acesso à internet, não é coletado pelo
-# pytest (não tem prefixo "test_"), e não faz sentido em CI. Ver
-# tests/manual/README.md.
+# tests/manual/ (ex.: verificar_letras_qobuz.py) fica DE FORA de
+# propósito: exige login real no Qobuz e acesso à internet, não é
+# coletado pelo pytest (não tem prefixo "test_"), e não faz sentido em
+# CI. Ver tests/manual/README.md.
 
 on:
   push:
@@ -20,24 +26,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  lint:
-    name: Flake8
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout do código
-        uses: actions/checkout@v7
-
-      - name: Setup Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.12"
-
-      - name: Instala flake8
-        run: python -m pip install --upgrade pip flake8
-
-      - name: Roda flake8 (usa o .flake8 do repo)
-        run: flake8 qobuz_dl
-
   tests:
     name: Testes (pytest)
     runs-on: ubuntu-latest
