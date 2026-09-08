@@ -393,6 +393,16 @@ Ao executar `python -m qobuz_dl -r`, o assistente de configuração agora pergun
 `”Disable OS Keyring and save tokens in config.ini?”` (Desativar Keyring do SO e salvar tokens no config.ini?)
 Selecione **`yes`** se estiver em um ambiente de servidor ou NAS. Isso ignorará o chaveiro do sistema e garantirá que seus tokens persistam no arquivo `config.ini`, garantindo 100% de estabilidade na autenticação.
 
+### 🩺 Verificação manual de integridade de áudio
+
+Todo download já passa automaticamente pela verificação de integridade (decodificação real do arquivo, não só leitura de metadados). Se você quiser rodar essa mesma checagem manualmente sobre arquivos já baixados — por exemplo depois de mover a biblioteca pra outro disco, ou pra investigar um arquivo específico — use:
+
+```bash
+python check_audio.py
+```
+
+É interativo: pergunta a pasta de música (sugerindo a do `config.ini` ou o diretório atual), varre as subpastas em busca de arquivos de áudio, e mostra um menu pra você escolher qual inspecionar. Reusa a mesma lógica de `qobuz_dl/utils.py` usada pelo downloader (via FFmpeg), então o resultado é consistente com o que já foi checado no momento do download.
+
 ## 🏆 Créditos
 * **[vitiko98](https://github.com/vitiko98/qobuz-dl)**: Criador do projeto original.
 * **[xwell](https://github.com/xwell/qobuz-dl)**: Pela grande reformulação do mecanismo de tags e integração com os “Goodies”.
