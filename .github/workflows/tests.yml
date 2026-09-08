@@ -39,7 +39,7 @@ jobs:
           python-version: "3.12"
 
       - name: Instala o projeto com as dependências de dev
-        run: python -m pip install --upgrade pip && pip install -e ".[dev]"
+        run: python -m pip install --upgrade pip && pip install -e ".[all, dev]"
 
       - name: Roda a suíte de testes (pula os marcados "slow")
         run: pytest -m "not slow" -q
