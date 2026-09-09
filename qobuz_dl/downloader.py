@@ -13,10 +13,8 @@ from qobuz_dl.constants import (
 )
 from qobuz_dl.db import handle_download_id
 from qobuz_dl.utils import (
-    get_album_artist,
     clean_filename,
     verify_audio_integrity,
-    classify_release_type,
     get_apple_hq_cover,
 )
 from .lyrics_engine import LyricsEngine
@@ -30,7 +28,7 @@ import re
 import threading
 import signal
 import textwrap
-from typing import Optional, Tuple
+from typing import Optional
 import asyncio
 
 import httpx
@@ -67,7 +65,6 @@ from qobuz_dl.download_utils import (
     is_track_streamable,
     create_missing_placeholder,
     _get_safe_ncols,
-    _desc_budget,
     _PositionPool,
     format_release_type,
     process_folder_format_with_subdirs,
