@@ -60,19 +60,11 @@ HEADER_STAGGER_DELAY = 1.5
 # sem precisar duplicar a escolha de cor em outro lugar.
 # --------------------------------------------------------------------------
 from qobuz_dl.interactive_ui import (
-    _shade,
     _align_text,
     _get_table_layout,
     pt_style,
     prompt_style,
     _hex_accent,
-    _darker_accent,
-    _hex_item_title,
-    _hex_type_album,
-    _hex_type_ep,
-    _hex_type_single,
-    _hex_type_track,
-    _hex_type_comp,
 )
 # ANTES: o tema visual (pt_style/prompt_style) e os helpers _shade/
 # _align_text/_get_table_layout estavam definidos aqui direto. Movidos pra
