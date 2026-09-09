@@ -65,6 +65,7 @@ from qobuz_dl.interactive_ui import (
     pt_style,
     prompt_style,
     _hex_accent,
+    _shade,
 )
 # ANTES: o tema visual (pt_style/prompt_style) e os helpers _shade/
 # _align_text/_get_table_layout estavam definidos aqui direto. Movidos pra
