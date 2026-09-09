@@ -167,3 +167,7 @@ ignore = [
 
 [tool.ruff.lint.mccabe]
 max-complexity = 55
+
+[tool.ruff.lint.per-file-ignores]
+"downloader.py" = ["F401"]
+"core.py" = ["F401"]
