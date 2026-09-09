@@ -140,9 +140,7 @@ class TestMigracaoV2ParaV2_1_4:
                   PRIMARY KEY ("id", "quality")
                 )
             """)
-            conn.execute(
-                "INSERT INTO downloads (id, quality) VALUES ('xyz789', 27)"
-            )
+            conn.execute("INSERT INTO downloads (id, quality) VALUES ('xyz789', 27)")
 
     def test_adiciona_artist_e_album_sem_perder_dados(self, tmp_path):
         caminho = str(tmp_path / "downloads.db")
@@ -207,7 +205,9 @@ class TestHandleDownloadId:
         create_db(caminho)
 
         await handle_download_id(caminho, "id-1", add_id=True, quality=27)
-        await handle_download_id(caminho, "id-1", add_id=True, quality=27)  # não deve lançar
+        await handle_download_id(
+            caminho, "id-1", add_id=True, quality=27
+        )  # não deve lançar
 
         with sqlite3.connect(caminho) as conn:
             n = conn.execute(
@@ -225,7 +225,9 @@ class TestHandleDownloadId:
         await handle_download_id(caminho, "id-1", add_id=True, quality=27)
 
         with sqlite3.connect(caminho) as conn:
-            n = conn.execute("SELECT COUNT(*) FROM downloads WHERE id='id-1'").fetchone()[0]
+            n = conn.execute(
+                "SELECT COUNT(*) FROM downloads WHERE id='id-1'"
+            ).fetchone()[0]
         assert n == 2
 
     async def test_todos_os_campos_sao_gravados_de_verdade(self, tmp_path):

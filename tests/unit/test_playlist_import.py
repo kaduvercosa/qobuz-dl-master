@@ -73,7 +73,7 @@ class TestParseTxt:
         ]
 
     def test_dois_pontos_sem_espaco_depois_nao_e_separador(self, tmp_path):
-        """"Artista:Título" sem espaço após os dois-pontos não bate o
+        """ "Artista:Título" sem espaço após os dois-pontos não bate o
         regex de separador -- vira tudo título, sem artista. Comportamento
         real do `_SEP_RE`, travado aqui de propósito."""
         arquivo = tmp_path / "p.txt"
@@ -121,9 +121,7 @@ class TestParseTxt:
             {"artist": "Radiohead", "title": "Creep"}
         ]
 
-    def test_sem_extensao_com_conteudo_de_texto_puro_cai_no_parser_txt(
-        self, tmp_path
-    ):
+    def test_sem_extensao_com_conteudo_de_texto_puro_cai_no_parser_txt(self, tmp_path):
         arquivo = tmp_path / "playlist_sem_extensao"
         arquivo.write_text("Radiohead - Creep\n")
         assert parse_playlist_file(str(arquivo)) == [
@@ -168,7 +166,7 @@ class TestParseCsv:
 
     def test_multiplos_artistas_pega_so_o_primeiro(self, tmp_path):
         arquivo = tmp_path / "p.csv"
-        arquivo.write_text("artist,title\n\"Artista A, Artista B\",Faixa\n")
+        arquivo.write_text('artist,title\n"Artista A, Artista B",Faixa\n')
         assert parse_playlist_file(str(arquivo)) == [
             {"artist": "Artista A", "title": "Faixa"}
         ]
@@ -224,9 +222,7 @@ class TestParseJson:
     def test_exportify(self, tmp_path):
         arquivo = tmp_path / "p.json"
         arquivo.write_text(
-            json.dumps(
-                [{"Track Name": "Creep", "Artist Name(s)": "Radiohead, Outro"}]
-            )
+            json.dumps([{"Track Name": "Creep", "Artist Name(s)": "Radiohead, Outro"}])
         )
         assert parse_playlist_file(str(arquivo)) == [
             {"artist": "Radiohead", "title": "Creep"}
@@ -255,9 +251,7 @@ class TestParseJson:
     def test_lastfm_com_wrapper_track(self, tmp_path):
         arquivo = tmp_path / "p.json"
         arquivo.write_text(
-            json.dumps(
-                {"track": [{"name": "Creep", "artist": {"name": "Radiohead"}}]}
-            )
+            json.dumps({"track": [{"name": "Creep", "artist": {"name": "Radiohead"}}]})
         )
         assert parse_playlist_file(str(arquivo)) == [
             {"artist": "Radiohead", "title": "Creep"}
@@ -298,15 +292,15 @@ class TestParseJson:
     def test_item_que_nao_e_dict_e_ignorado_sem_quebrar(self, tmp_path):
         arquivo = tmp_path / "p.json"
         arquivo.write_text(
-            json.dumps(["isso não é uma faixa", {"artist": "Radiohead", "title": "Creep"}])
+            json.dumps(
+                ["isso não é uma faixa", {"artist": "Radiohead", "title": "Creep"}]
+            )
         )
         assert parse_playlist_file(str(arquivo)) == [
             {"artist": "Radiohead", "title": "Creep"}
         ]
 
-    def test_json_de_nivel_superior_que_nao_e_lista_nem_dict_de_faixa(
-        self, tmp_path
-    ):
+    def test_json_de_nivel_superior_que_nao_e_lista_nem_dict_de_faixa(self, tmp_path):
         arquivo = tmp_path / "p.json"
         arquivo.write_text(json.dumps(42))
         with pytest.raises(ValueError, match="lista de faixas"):

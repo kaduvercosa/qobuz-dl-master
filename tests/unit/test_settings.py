@@ -18,7 +18,11 @@ import types
 
 import pytest
 
-from qobuz_dl.constants import DEFAULT_FOLDER, DEFAULT_MULTIPLE_DISC_TRACK, DEFAULT_TRACK
+from qobuz_dl.constants import (
+    DEFAULT_FOLDER,
+    DEFAULT_MULTIPLE_DISC_TRACK,
+    DEFAULT_TRACK,
+)
 from qobuz_dl.settings import QobuzDLSettings, _merge_bool_opt_in, _merge_bool_opt_out
 
 pytestmark = pytest.mark.unit
@@ -146,8 +150,7 @@ class TestMergeBoolOptIn:
 
     def test_no_opcao_desliga_mesmo_com_opcao_ligada(self):
         assert (
-            _merge_bool_opt_in(_args(no_cover=True, cover=True), "cover", True)
-            is False
+            _merge_bool_opt_in(_args(no_cover=True, cover=True), "cover", True) is False
         )
 
     def test_opcao_liga_sem_o_no_(self):
