@@ -23,7 +23,6 @@ platformdirs
 charset_normalizer
 mutagen
 tqdm
-questionary
 prompt_toolkit
 packaging
 colorama>=0.4.6
