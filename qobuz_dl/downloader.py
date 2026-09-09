@@ -71,7 +71,9 @@ from qobuz_dl.download_utils import (
     _clean_format_str,
     _safe_get,
     _artist_label,
+    get_album_artist,
 )
+
 # ANTES: as 10 funções/classe acima estavam definidas aqui direto. Movidas
 # pra qobuz_dl/download_utils.py (passo 1 de quebrar este arquivo em
 # módulos menores -- downloader.py tinha 2526 linhas) porque eram
