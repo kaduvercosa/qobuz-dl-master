@@ -28,7 +28,9 @@ class TestMakeSortName:
         assert _make_sort_name("L'Orchestra") == "Orchestra, L'"
 
     def test_lista_de_artistas_processa_cada_um(self):
-        assert _make_sort_name(["The Beatles", "Metallica"]) == "Beatles, The, Metallica"
+        assert (
+            _make_sort_name(["The Beatles", "Metallica"]) == "Beatles, The, Metallica"
+        )
 
     def test_lista_ignora_itens_vazios(self):
         assert _make_sort_name(["The Beatles", "", None]) == "Beatles, The"
@@ -114,7 +116,9 @@ class TestFormatGenres:
     def test_seta_de_hierarquia_e_dividida(self):
         # "\u2192" é a seta usada pela API do Qobuz pra indicar hierarquia
         # de gênero (Rock -> Rock Alternativo).
-        assert _format_genres(["Rock\u2192Rock Alternativo"]) == "Rock, Rock Alternativo"
+        assert (
+            _format_genres(["Rock\u2192Rock Alternativo"]) == "Rock, Rock Alternativo"
+        )
 
     def test_barra_tambem_divide(self):
         assert _format_genres(["Pop/Dance"]) == "Pop, Dance"

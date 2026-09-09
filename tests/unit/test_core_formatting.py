@@ -15,10 +15,6 @@ que dá pra fazer com confiança numa passada só. Cobrir isso é trabalho
 futuro, feito em pedaços menores.
 """
 
-import os
-
-import pytest
-
 from qobuz_dl import core
 
 

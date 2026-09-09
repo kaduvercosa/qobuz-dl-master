@@ -46,7 +46,9 @@ class TestGetTableLayoutCategorias:
             ("artist", 2),
         ],
     )
-    def test_numero_de_colunas_bate_com_os_headers(self, categoria, qtd_colunas_esperada):
+    def test_numero_de_colunas_bate_com_os_headers(
+        self, categoria, qtd_colunas_esperada
+    ):
         is_table, widths, headers, borders = _get_table_layout(
             120, is_multi=False, item_category=categoria
         )
@@ -69,7 +71,9 @@ class TestGetTableLayoutCategorias:
         assert headers == ["NOME DA PLAYLIST", "CRIADOR", "FAIXAS", "DURAÇÃO"]
 
     def test_headers_do_artist_estao_corretos(self):
-        _, _, headers, _ = _get_table_layout(120, is_multi=False, item_category="artist")
+        _, _, headers, _ = _get_table_layout(
+            120, is_multi=False, item_category="artist"
+        )
         assert headers == ["NOME DO ARTISTA", "LANÇAMENTOS"]
 
     def test_larguras_das_colunas_flex_nunca_ficam_negativas(self):
@@ -77,7 +81,9 @@ class TestGetTableLayoutCategorias:
         # bem apertada (mas ainda >=78 colunas), a coluna de texto livre
         # não pode virar 0 ou negativa.
         for categoria in ("album", "track", "playlist", "artist"):
-            _, widths, _, _ = _get_table_layout(78, is_multi=False, item_category=categoria)
+            _, widths, _, _ = _get_table_layout(
+                78, is_multi=False, item_category=categoria
+            )
             assert all(w > 0 for w in widths), f"{categoria}: {widths}"
 
     def test_is_multi_reduz_o_espaco_disponivel_pro_flex(self):
@@ -93,7 +99,9 @@ class TestGetTableLayoutCategorias:
         assert widths_multi[0] <= widths_single[0]
 
     def test_bordas_tem_as_tres_chaves_e_comecam_e_terminam_certo(self):
-        _, widths, _, borders = _get_table_layout(120, is_multi=False, item_category="album")
+        _, widths, _, borders = _get_table_layout(
+            120, is_multi=False, item_category="album"
+        )
         assert set(borders.keys()) == {"top", "mid", "bot"}
         for borda in borders.values():
             assert borda.startswith("+-")

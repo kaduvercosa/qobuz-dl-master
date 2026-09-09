@@ -148,11 +148,11 @@ class TestLoadAccentRgb:
     @pytest.mark.parametrize(
         "valor_invalido",
         [
-            "lixo",              # não são números
-            "10;20",             # faltando um canal
-            "10;20;30;40",       # canal a mais
-            "10;20;300",         # fora do range 0-255
-            "-5;20;30",          # negativo
+            "lixo",  # não são números
+            "10;20",  # faltando um canal
+            "10;20;30;40",  # canal a mais
+            "10;20;300",  # fora do range 0-255
+            "-5;20;30",  # negativo
         ],
     )
     def test_accent_invalido_nao_derruba_e_cai_pro_default(
@@ -183,9 +183,7 @@ class TestAccentPreview:
         # o mock precisa aceitar *args/**kwargs, senão quebra o pytest
         # enquanto o mock estiver ativo (gera INTERNALERROR real, já visto
         # em execução).
-        monkeypatch.setattr(
-            color.shutil, "get_terminal_size", lambda *a, **k: (80, 24)
-        )
+        monkeypatch.setattr(color.shutil, "get_terminal_size", lambda *a, **k: (80, 24))
         resultado = color.accent_preview("\033[38;2;1;2;3m", "Teste")
         assert "Escuro:" in resultado and "Claro:" in resultado
         # Modo estreito quebra em duas linhas (uma pra cada amostra).
@@ -205,9 +203,7 @@ class TestAccentPreview:
         # `max(2, ...)` tem que segurar isso. Sem o clamp, " " * negativo
         # não quebra (Python trata como zero), mas o recuo documentado
         # como "piso de 2" deixaria de existir silenciosamente.
-        monkeypatch.setattr(
-            color.shutil, "get_terminal_size", lambda *a, **k: (20, 24)
-        )
+        monkeypatch.setattr(color.shutil, "get_terminal_size", lambda *a, **k: (20, 24))
         resultado = color.accent_preview("\033[38;2;1;2;3m")
         indent_line = next(l for l in resultado.split("\n") if "Escuro:" in l)
         recuo = len(indent_line) - len(indent_line.lstrip(" "))

@@ -115,10 +115,14 @@ class TestCache:
         # falharia por não ter uma segunda resposta registrada.
         segunda = await musicbrainz.lookup_by_isrc("GBAYE0000001")
 
-        assert primeira == segunda == (
-            "track-mbid-123",
-            "album-mbid-456",
-            "artist-mbid-789",
+        assert (
+            primeira
+            == segunda
+            == (
+                "track-mbid-123",
+                "album-mbid-456",
+                "artist-mbid-789",
+            )
         )
 
     async def test_sem_recordings_tambem_e_cacheado(self, httpx_mock):

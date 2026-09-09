@@ -8,7 +8,6 @@ real demais pra um teste unitário confiável numa passada só).
 
 import os
 
-import pytest
 
 from qobuz_dl.downloader import (
     _artist_label,
@@ -114,7 +113,10 @@ class TestFormatReleaseType:
         assert format_release_type("album", track_count=10) == "Album"
 
     def test_sem_nenhum_dado_e_desconhecido(self):
-        assert format_release_type(None, track_count=0, duration_seconds=0) == "Desconhecido"
+        assert (
+            format_release_type(None, track_count=0, duration_seconds=0)
+            == "Desconhecido"
+        )
 
 
 # --------------------------------------------------------------------
@@ -149,7 +151,7 @@ class TestProcessFolderFormatWithSubdirs:
 
     def test_caracteres_invalidos_de_path_sao_sanitizados(self):
         resultado = process_folder_format_with_subdirs(
-            "{titulo}", {"titulo": 'Nome: com / caracteres * inválidos?'}
+            "{titulo}", {"titulo": "Nome: com / caracteres * inválidos?"}
         )
         # sanitize_filepath/clean_filename removem os caracteres reservados
         # do SO -- não pode sobrar ":" nem "*" nem "?" no nome final.
@@ -158,9 +160,7 @@ class TestProcessFolderFormatWithSubdirs:
         assert "?" not in resultado
 
     def test_parte_vazia_e_ignorada(self):
-        resultado = process_folder_format_with_subdirs(
-            "{a}//{b}", {"a": "X", "b": "Y"}
-        )
+        resultado = process_folder_format_with_subdirs("{a}//{b}", {"a": "X", "b": "Y"})
         assert resultado == os.path.join("X", "Y")
 
     def test_nome_muito_longo_e_truncado_no_meio(self):

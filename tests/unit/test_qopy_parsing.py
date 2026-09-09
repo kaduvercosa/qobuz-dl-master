@@ -47,7 +47,9 @@ class TestCheckSubscriptionSemDados:
     def test_subscription_que_nao_e_dict_tambem_cai_no_default(self):
         # Resposta inesperada da API (ex.: subscription=null virou string
         # em algum bug de outro sistema) não pode derrubar o parsing.
-        resultado = _cliente_com({"subscription": "algo-nao-e-dict"}).check_subscription()
+        resultado = _cliente_com(
+            {"subscription": "algo-nao-e-dict"}
+        ).check_subscription()
         assert resultado["is_active"] is False
         assert resultado["status"] == "Inativa / Sem Assinatura"
 
@@ -83,7 +85,11 @@ class TestCheckSubscriptionComEndDate:
         assert resultado["is_active"] is True
 
     def test_end_date_em_formato_invalido_nao_derruba_e_usa_fallback(self):
-        sub = {"offer": "premium", "end_date": "isto-nao-e-uma-data", "is_canceled": False}
+        sub = {
+            "offer": "premium",
+            "end_date": "isto-nao-e-uma-data",
+            "is_canceled": False,
+        }
         resultado = _cliente_com({"subscription": sub}).check_subscription()
         # Cai no except: is_active = not is_canceled
         assert resultado["is_active"] is True

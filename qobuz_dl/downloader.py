@@ -65,7 +65,6 @@ from qobuz_dl.download_utils import (
     is_track_streamable,
     create_missing_placeholder,
     _get_safe_ncols,
-    _desc_budget,
     _PositionPool,
     format_release_type,
     process_folder_format_with_subdirs,
