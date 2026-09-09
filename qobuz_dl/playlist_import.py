@@ -233,8 +233,9 @@ def _parse_json(path: str) -> list[dict[str, str]]:
 
         # Formato genérico: {"title": "...", "artist": "..."}
         else:
-            title = (item.get("title") or item.get("name") or "").strip()
-            artist = (item.get("artist") or item.get("artists") or "").strip()
+            title = item.get("title") or item.get("name") or ""
+            artist = item.get("artist") or item.get("artists") or ""
+
             if isinstance(artist, list):
                 artist = artist[0] if artist else ""
 
