@@ -233,9 +233,17 @@ def _parse_json(path: str) -> list[dict[str, str]]:
 
         # Formato genérico: {"title": "...", "artist": "..."}
         else:
-            title = item.get("title") or item.get("name") or ""
+            title = (item.get("title") or item.get("name") or "").strip()
+            # BUGFIX: chamava .strip() aqui ANTES de checar se "artists"
+            # veio como lista (ex.: {"artists": ["Radiohead", "Outro"]},
+            # formato que o Exportify/Soundiiz às vezes usam) -- uma lista
+            # não tem `.strip()`, então isso quebrava com
+            # `AttributeError: 'list' object has no attribute 'strip'`
+            # bem antes do `isinstance(artist, list)` logo abaixo ter a
+            # chance de tratar o caso. O `str(artist).strip()" no fim da
+            # função já cobre a normalização de string, então a chamada
+            # aqui era redundante além de quebrada.
             artist = item.get("artist") or item.get("artists") or ""
-
             if isinstance(artist, list):
                 artist = artist[0] if artist else ""
 
