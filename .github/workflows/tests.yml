@@ -24,6 +24,11 @@ on:
   pull_request:
     branches: ["master", "main"]
   workflow_dispatch:
+  # Permite que outros workflows (pypi.yml, docker.yml) rodem esta mesma
+  # suíte como um "gate" antes de publicar, via `uses:
+  # ./.github/workflows/tests.yml` -- sem duplicar os passos de setup +
+  # pytest em cada um deles.
+  workflow_call:
 
 jobs:
   tests:
