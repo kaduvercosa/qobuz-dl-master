@@ -12,8 +12,15 @@ on:
         default: '2.5.2'
 
 jobs:
+  # Roda a MESMA suíte de tests.yml antes de publicar -- sem isso, uma
+  # release com testes quebrados ainda subia pro PyPI normalmente, já que
+  # `release: published` não tinha nenhuma relação com o resultado do CI.
+  testes:
+    uses: ./.github/workflows/tests.yml
+
   pypi-publish:
     name: Build and publish to PyPI
+    needs: testes
     runs-on: ubuntu-latest
 
     permissions:
